@@ -69,7 +69,7 @@ E-Mail：chenarnold0705@gmail.com<br>
 3. 修改 `GAS.js` 頂部的常數：
     * `DISCORD_WEBHOOK`: 貼入你的 Discord 頻道 Webhook 網址。
     * `RECAPTCHA_SECRET`: 貼入你的 reCAPTCHA Secret Key (對這邊是Secret Key不要貼錯了)。
-4.修改裡面提到 `臺中高工` 的地方。
+4. 修改裡面提到 `臺中高工` 的地方。
 5. 點選右上方 `部署` -> `新增部署` 。
     * 有一個齒輪的符號，點下去就對了，在那邊選 `網頁應用程式 (Web App)`
     * 設定參數如下：
