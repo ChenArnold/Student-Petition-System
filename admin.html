@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作人員後台</title>
+    <style>
+        /* ⭐ 修正 1: 將主要文字顏色改為 #656769 */
+        :root { --theme-color: #fda755; --text-color: #656769; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background: transparent; margin: 0; padding: 10px; }
+        input, select, textarea {
+            width: 100%; padding: 12px; border: 1px solid #999;
+            border-radius: 6px; box-sizing: border-box;
+            font-family: inherit; font-size: 16px; margin-bottom: 15px;
+            color: var(--text-color); /* ⭐ 修正：輸入框、選單、回覆內容文字顏色 */
+            background-color: #fff;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--theme-color); box-shadow: 0 0 0 3px rgba(253, 167, 85, 0.25); }
+        
+        /* 基礎按鈕樣式 */
+        button {
+            background-color: var(--theme-color); color: white; border: none; padding: 12px 24px;
+            border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 100;
+        }
+        button:hover { filter: brightness(0.9); transform: translateY(-1px); }
+        
+        /* 登入頁標題顏色 */
+        #loginView {
+            max-width: 400px; margin: 40px auto; text-align: center;
+            background: transparent; /* ⭐ 修正：移除背景色 */
+            padding: 40px 30px; border-radius: 12px;
+            box-shadow: none;
+            border: none; /* ⭐ 修正：移除邊框 */
+        }
+        #loginView h2 {
+            margin: 0 0 20px 0;
+            color: var(--text-color);
+        }
+        
+        #dashboardView {
+            max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; min-height: 500px;
+            position: relative; z-index: 1;
+        }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+        .header-bar h3 {
+            margin:0;
+            color: var(--text-color);
+        }
+        .logout-btn { background: #999; font-size: 13px; padding: 6px 15px; border-radius: 30px; box-shadow: none;}
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab-btn {
+            flex: 1; background: transparent; border: 2px solid var(--theme-color); color: var(--theme-color);
+            padding: 10px; cursor: pointer; border-radius: 0; margin: 0; font-size: 15px; font-weight: bold;
+        }
+        .tab-btn:first-child { border-radius: 8px 0 0 8px; border-right: none; }
+        .tab-btn:last-child { border-radius: 0 8px 8px 0; border-left: none; }
+        .tab-btn.active { background: var(--theme-color); color: white; }
+        .card {
+            background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px;
+            border: 1px solid #ddd; border-left: 6px solid #ccc; box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 50;
+        }
+        .status-waiting { border-left-color: #f0ad4e; }
+        .status-processing { border-left-color: #5bc0de; }
+        .status-done { border-left-color: #5cb85c; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .meta-info { font-size: 13px; color: #666; margin-bottom: 5px; display: block; }
+        .card-title { font-size: 18px; font-weight: bold; color: var(--text-color); margin: 0; }
+        .status-wrapper { display: flex; gap: 5px; align-items: center; }
+        .status-select {
+            padding: 5px 10px; font-size: 14px; font-weight: bold;
+            color: var(--text-color);
+            border-radius: 15px; border: 1px solid #999; cursor: pointer; width: auto; margin-bottom: 0; background: #fff;
+        }
+        
+        /* 修正：儲存按鈕的顏色和大小 */
+        .save-status-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            background: #6c757d;
+            border-radius: 15px;
+            margin: 0;
+            min-width: 40px;
+            color: white;
+            position: relative;
+            z-index: 101;
+        }
+        
+        .content-box { background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap; margin-bottom: 15px; color: var(--text-color); border: 1px solid #eee; line-height: 1.6;}
+        
+        .reply-area { border-top: 1px dashed #ccc; padding-top: 15px; margin-top: 15px; }
+        .reply-area label {
+            color: var(--text-color);
+        }
+        /* 唯讀回覆內容的文字顏色也已透過上面的 general input 規則修正 */
+        .reply-area textarea { height: 100px; border: 1px solid #ccc;}
+        .reply-btn-row { text-align: right; }
+        
+        /* 修正回覆按鈕 CSS */
+        .reply-btn {
+            background: #5cb85c;
+            width: 100%;
+            font-size: 16px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(92, 184, 92, 0.3);
+        }
+        .reply-btn:hover { background: #4cae4c; }
+        .hidden { display: none !important; }
+        
+        #loading {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(255,255,255,0.9);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; flex-direction: column; color: var(--theme-color);
+        }
+        /* --- Custom Modal Styling (已修正為透明背景與強陰影) --- */
+        #customModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent;
+            display: flex; justify-content: center;
+            align-items: center; z-index: 10000;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 10px; max-width: 90%;
+            width: 400px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transform: scale(0.9); opacity: 0; transition: all 0.2s ease-out;
+        }
+        .modal-content.show { transform: scale(1); opacity: 1; }
+        .modal-message { margin-bottom: 25px; font-size: 18px; line-height: 1.5; color: var(--text-color); }
+        .modal-buttons button {
+            margin: 0 10px; padding: 10px 20px; border-radius: 5px; font-weight: normal;
+            width: 120px;
+        }
+        #modalBtnCancel { background-color: #6c757d; }
+        #modalBtnCancel:hover { background-color: #5a6268; }
+        #modalBtnConfirm { background-color: var(--theme-color); }
+
+        /* 新增：顯示主旨的樣式 */
+        .subject-line {
+            font-size: 15px;
+            font-weight: bold;
+            color: #444;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        /* 新增：人員名稱樣式 */
+        #displayName {
+            font-size: 14px;
+            color: #888;
+            font-weight: normal;
+            margin-left: 10px;
+        }
+
+        textarea[id^="reply-"] {
+            width: 100%;            /* 寬度填滿容器 */
+            max-width: 100%;        /* 禁止寬度超過容器導致破圖 */
+            min-height: 250px;      /* 增加預設長度 (高度) */
+            resize: vertical;       /* 只允許管理員上下拉長，不允許水平拉寬破壞佈局 */
+            line-height: 1.5;
+            padding: 15px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loading" class="hidden" style="display: none;">
+    <h3 style="font-size: 24px;">🔄 處理中...</h3>
+</div>
+
+<!-- Custom Modal Structure -->
+<div id="customModal" class="hidden">
+    <div class="modal-content" id="modalContent">
+        <p class="modal-message" id="modalMessage"></p>
+        <div class="modal-buttons">
+            <button id="modalBtnCancel" class="hidden">取消</button>
+            <button id="modalBtnConfirm">確定</button>
+        </div>
+    </div>
+</div>
+<!-- End Custom Modal Structure -->
+
+<div id="loginView">
+    <h2>工作人員登入</h2>
+    <p style="color:#666; margin-bottom:20px;">臺中高工學生陳情系統網頁後台</p>
+    <div style="text-align: left;">
+        <label style="font-weight:bold; display:block; margin-bottom:5px; color:var(--text-color);">帳號</label>
+        <input type="text" id="acc" placeholder="請輸入帳號">
+    </div>
+    <div style="text-align: left;">
+        <label style="font-weight:bold; display:block; margin-bottom:5px; color:var(--text-color);">密碼</label>
+        <input type="password" id="pwd" placeholder="請輸入密碼">
+    </div>
+    <button id="loginBtn" style="width:100%; margin-top:10px;">登入系統</button>
+    <p id="msg" style="color: #d9534f; margin-top: 15px; font-weight: bold;"></p>
+</div>
+
+<div id="dashboardView" class="hidden">
+    <div class="header-bar">
+        <h3>案件管理後台<span id="displayName"></span></h3>
+        <button class="logout-btn" id="logoutBtn">登出</button>
+    </div>
+    <div class="tabs">
+        <button class="tab-btn active" id="tabBtn_待處理">待處理</button>
+        <button class="tab-btn" id="tabBtn_處理中">處理中</button>
+        <button class="tab-btn" id="tabBtn_處理完成">處理完成</button>
+    </div>
+    <div id="listArea"></div>
+</div>
+
+<script>
+    const scriptURL = 'Google App Script 的 網頁應用程式網址 (第三步複製的那個)'; 
+
+    let allCases = [];
+    let currentTab = '待處理';
+    let confirmCallback = null; 
+
+    function hideModal() {
+        document.getElementById('customModal').classList.add('hidden');
+        document.getElementById('modalContent').classList.remove('show');
+    }
+
+    function showCustomAlert(message) {
+        document.getElementById('modalMessage').innerText = message;
+        document.getElementById('modalBtnCancel').classList.add('hidden');
+        document.getElementById('modalBtnConfirm').onclick = () => {
+            hideModal();
+            confirmCallback = null;
+        };
+        document.getElementById('customModal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('modalContent').classList.add('show'), 10);
+    }
+
+    function showCustomConfirm(message, callback) {
+        document.getElementById('modalMessage').innerText = message;
+        document.getElementById('modalBtnCancel').classList.remove('hidden');
+        confirmCallback = callback;
+        document.getElementById('modalBtnConfirm').onclick = () => {
+            if (confirmCallback) { confirmCallback(true); }
+            hideModal();
+            confirmCallback = null;
+        };
+        document.getElementById('modalBtnCancel').onclick = () => {
+            hideModal();
+            confirmCallback = null;
+        };
+        document.getElementById('customModal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('modalContent').classList.add('show'), 10);
+    }
+
+    window.onload = () => {
+        initEventListeners();
+        if (sessionStorage.getItem('isStaff') === 'true') {
+            showDash();
+        }
+    };
+
+    function initEventListeners() {
+        document.getElementById('loginBtn').addEventListener('click', login);
+        document.getElementById('tabBtn_待處理').addEventListener('click', () => switchTab('待處理'));
+        document.getElementById('tabBtn_處理中').addEventListener('click', () => switchTab('處理中'));
+        document.getElementById('tabBtn_處理完成').addEventListener('click', () => switchTab('處理完成'));
+        document.addEventListener('click', handleFinalDelegation);
+    }
+
+    function handleFinalDelegation(event) {
+        const target = event.target;
+        if (target.id === 'logoutBtn') { logout(); return; }
+        if (target.classList.contains('save-status-btn')) {
+            const caseId = target.id.replace('saveBtn-', '');
+            justUpdateStatus(caseId);
+            return;
+        }
+        if (target.classList.contains('reply-btn')) {
+            const caseId = target.id.replace('replyBtn-', '');
+            sendReplyAndClose(caseId);
+            return;
+        }
+    }
+
+    function toggleLoading(show) {
+        const el = document.getElementById('loading');
+        if (show) {
+            el.style.display = 'flex'; el.classList.remove('hidden');
+        } else {
+            el.style.display = 'none'; el.classList.add('hidden');
+        }
+    }
+
+    function logout() {
+        showCustomConfirm("確定要登出嗎？", (confirmed) => {
+            if (confirmed) {
+                sessionStorage.removeItem('isStaff');
+                sessionStorage.removeItem('staffName');
+                sessionStorage.removeItem('staffPosition');
+                document.getElementById('dashboardView').style.display = 'none';
+                document.getElementById('loginView').style.display = 'block';
+                document.getElementById('msg').innerText = '';
+            }
+        });
+    }
+
+    function login() {
+        let acc = document.getElementById('acc').value;
+        let pwd = document.getElementById('pwd').value;
+        if (!acc || !pwd) { document.getElementById('msg').innerText = "❌ 請輸入帳號與密碼"; return; }
+        
+        toggleLoading(true);
+        let fd = new FormData();
+        fd.append('action', 'staffLogin');
+        fd.append('account', acc);
+        fd.append('password', pwd);
+
+        fetch(scriptURL, { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => {
+                toggleLoading(false);
+                if (d.result === 'success') {
+                    sessionStorage.setItem('staffAcc', acc); // 暫存帳號
+                    sessionStorage.setItem('staffPwd', pwd); // 暫存密碼
+                    sessionStorage.setItem('staffName', d.name || 'N/A');
+                    sessionStorage.setItem('staffPosition', d.position || 'N/A');
+                    document.getElementById('acc').value = ''; document.getElementById('pwd').value = '';
+                    showDash();
+                } else {
+                    document.getElementById('msg').innerText = "❌ " + (d.error || "帳號或密碼錯誤");
+                }
+            })
+            .catch(e => {
+                toggleLoading(false);
+                document.getElementById('msg').innerHTML = "❌ 連線失敗！";
+            });
+    }
+
+    function showDash() {
+        document.getElementById('loginView').style.display = 'none';
+        document.getElementById('dashboardView').classList.remove('hidden');
+        document.getElementById('dashboardView').style.display = 'block';
+        
+        // ⭐ 新增：顯示登入者名稱[cite: 5]
+        const name = sessionStorage.getItem('staffName');
+        const pos = sessionStorage.getItem('staffPosition');
+        document.getElementById('displayName').innerText = ` (登入者：${pos} ${name} )`;
+        
+        loadData();
+    }
+
+    function loadData() {
+        toggleLoading(true);
+        let fd = new FormData();
+        fd.append('action', 'getStaffData');    
+
+        fd.append('account', sessionStorage.getItem('staffAcc'));
+        fd.append('password', sessionStorage.getItem('staffPwd'));
+
+        fetch(scriptURL, { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => {
+                toggleLoading(false);
+                if (d.result === 'success') {
+                    allCases = d.cases;
+                    renderList();
+                } else {
+                    // 🛠️ 修正：直接彈出後端回傳的錯誤內容 (例如：權限不足)
+                    showCustomAlert("讀取失敗，後端回傳： " + (d.error || "未知錯誤"));
+                }
+            })
+            .catch(e => {
+                toggleLoading(false);
+                showCustomAlert("連線錯誤或後端程式崩潰");
+            });
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.toggle('active', b.innerText === tab);
+        });
+        renderList();
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function renderList() {
+        const area = document.getElementById('listArea');
+        area.innerHTML = '';
+        const isDoneTab = currentTab === '處理完成';
+        const filtered = allCases.filter(c => {
+            let s = c.status || '待處理';
+            if (s === '已結案' || s === '無效案件') s = '處理完成';
+            return s === currentTab;
+        });
+
+        if (filtered.length === 0) {
+            area.innerHTML = `<div style="text-align:center;color:#999;padding:40px;border:1px dashed #ccc;border-radius:10px;">目前無「${currentTab}」案件</div>`;
+            return;
+        }
+
+        filtered.forEach(c => {
+            let borderClass = 'status-waiting';
+            if (c.status === '處理中') borderClass = 'status-processing';
+            if (c.status === '處理完成' || c.status === '已結案' || c.status === '無效案件') borderClass = 'status-done';
+
+            // --- 1. 根據身分判斷顯示資訊 (你的需求位置) ---
+            let infoHtml = "";
+            if (c.identity === "實名") {
+                infoHtml = `
+                    <div style="background: #e7f3ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 5px solid #2196F3; font-size: 14px; color: #333;">
+                        <b style="color: #2196F3;">👤 實名陳情案件</b><br>
+                        姓名：${c.name || '未提供'}<br>
+                        學號：${c.studentId || '未提供'}<br>
+                        Mail：${c.email}
+                    </div>`;
+            } else {
+                infoHtml = `
+                    <div style="background: #fff5f5; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 5px solid #ff4d4f; font-size: 14px; color: #333;">
+                        <b style="color: #ff4d4f;">🔒 匿名陳情案件</b><br>
+                        Mail：${c.email}
+                    </div>`;
+            }
+
+            let statusControlHTML;
+            if (isDoneTab) {
+                let displayStatus = c.status === '已結案' ? '已結案' : (c.status === '無效案件' ? '無效案件' : '處理完成');
+                statusControlHTML = `<span style="font-weight:bold; color:#5cb85c; padding:6px 12px; border:1px solid #5cb85c; border-radius:15px; font-size:14px; background:#f0fff0;">${displayStatus}</span>`;
+            } else {
+                statusControlHTML = `
+                    <select id="status-select-${c.caseId}" class="status-select">
+                        <option value="待處理" ${c.status==='待處理'?'selected':''}>待處理</option>
+                        <option value="處理中" ${c.status==='處理中'?'selected':''}>處理中</option>
+                    </select>
+                    <button class="save-status-btn" id="saveBtn-${c.caseId}" title="儲存狀態與回覆草稿">💾 儲存</button>
+                `;
+            }
+            
+            let replyAreaHTML;
+            const handlingStaff = c.handlingStaff || '未記錄';
+            if (isDoneTab) {
+                replyAreaHTML = `
+                    <div class="reply-area">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">📢 最終回覆內容：</label>
+                        <textarea id="reply-${c.caseId}" readonly style="background:#e9ecef;">${c.reply || '無回覆內容'}</textarea>
+                        <div style="margin-top:15px; font-weight:bold; color:var(--text-color); border-top:1px solid #eee; padding-top:10px;">
+                            辦理人員：<span style="font-weight:normal; color:var(--text-color);">${handlingStaff}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const staffInfo = c.status === '處理中' ? 
+                `<div style="margin-bottom:15px; font-size:15px; ">陳辦人：${handlingStaff}</div>` : '';
+                replyAreaHTML = `
+                    <div class="reply-area">
+                        <label style="font-weight:bold; display:block; margin-bottom:5px;">📢 回覆內容：</label>
+                        <textarea id="reply-${c.caseId}" placeholder="請在此輸入回覆..." onkeydown="handleReplyKey(event, '${c.caseId}')">${c.reply || ''}</textarea>
+                        ${staffInfo}
+                        <div class="reply-btn-row">
+                            <button class="reply-btn" id="replyBtn-${c.caseId}">送出回覆並結案 ✉️</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // --- 2. 將 infoHtml 嵌入到卡片 HTML 中 ---
+            let div = document.createElement('div');
+            div.className = `card ${borderClass}`;
+            div.innerHTML = `
+                <div class="meta-info">${c.time.substring(0,16)} | ${c.caseId}</div>
+                <div class="card-header">
+                    <div class="card-title">【${c.category}】</div>
+                    <div class="status-wrapper">${statusControlHTML}</div>
+                </div>
+                ${infoHtml} 
+                <div class="subject-line">📍 主旨：${c.subject || '無主旨'}</div>
+                <div class="content-box">${escapeHtml(c.content).replace(/\n/g, '<br>')}</div>
+                ${replyAreaHTML}
+            `;
+            area.appendChild(div);
+        });
+    }
+
+    function handleReplyKey(event, caseId) {
+        if (event.keyCode === 13 && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            sendReplyAndClose(caseId);
+        }
+    }
+
+    function justUpdateStatus(caseId) {
+        let newStatus = document.getElementById(`status-select-${caseId}`).value;
+        let content = document.getElementById(`reply-${caseId}`).value;
+
+        const staffName = sessionStorage.getItem('staffName');
+        toggleLoading(true);
+        let fd = new FormData();
+        fd.append('action', 'staffUpdateStatus');
+        fd.append('caseId', caseId);
+        fd.append('status', newStatus);
+        fd.append('replyContent', content);
+        fd.append('handlingStaff', staffName);
+        fd.append('account', sessionStorage.getItem('staffAcc'));
+        fd.append('password', sessionStorage.getItem('staffPwd'));
+        fetch(scriptURL, { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => {
+                toggleLoading(false);
+                if(d.result === 'success') { 
+                    showCustomAlert("✅ 狀態已儲存！"); 
+                    loadData(); 
+                } else {
+                    // 🛠️ 修正：如果驗證失敗，這裡會跳出「權限不足」
+                    showCustomAlert("❌ 儲存失敗： " + d.error);
+                }
+            }).catch(() => { 
+                toggleLoading(false); 
+                showCustomAlert("網路連線異常");
+            });
+    }
+
+    function sendReplyAndClose(caseId) {
+        let content = document.getElementById(`reply-${caseId}`).value;
+        if (!content) { showCustomAlert("請輸入回覆內容"); return; }
+        showCustomConfirm("確定要送出回覆並「結案」嗎？", (confirmed) => {
+            if (confirmed) {
+                const staffName = sessionStorage.getItem('staffName');
+                toggleLoading(true);
+                let fd = new FormData();
+                fd.append('action', 'staffReply');
+                fd.append('caseId', caseId);
+                fd.append('status', '處理完成');
+                fd.append('replyContent', content);
+                fd.append('handlingStaff', staffName);
+                fd.append('account', sessionStorage.getItem('staffAcc')); 
+                fd.append('password', sessionStorage.getItem('staffPwd'));
+                fetch(scriptURL, { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(d => {
+                    toggleLoading(false);
+                    if(d.result === 'success') { 
+                        showCustomAlert("✅ 已送出回覆並結案！"); 
+                        loadData(); 
+                    } else {
+                        showCustomAlert("❌ 操作失敗：" + d.error); 
+                    }
+                }).catch(() => { toggleLoading(false); });
+            }
+        });
+    }
+</script>
+</body>
+</html>
