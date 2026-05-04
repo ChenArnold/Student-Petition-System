@@ -255,7 +255,7 @@
             </div>
 
             <div class="form-group" style="display: flex; justify-content: center; margin-top: 15px;">
-                <div class="g-recaptcha" data-sitekey="RECAPTCHA ID"></div>
+                <div class="g-recaptcha" data-sitekey="6LdXfNUsAAAAACEsxOxPTMciFbDuGAVARiaiHH6g"></div>
             </div>
 
             <div class="btn-container">
@@ -286,7 +286,7 @@
 
 <script>
     // ⚠️⚠️⚠️ 請將下方的網址換成您部署後的 Web 應用程式網址 ⚠️⚠️⚠️
-    const scriptURL = 'Google App Script 的 網頁應用程式網址 (第三步複製的那個)';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwMaRWcKnuKmflqEkt5HXFzeGeLlmflHoIfh6a4E3BDef-RQ1JxiohdIYBoZXkBBBH-/exec';
 
     const submissionForm = document.getElementById('submissionForm');
     const inquiryForm = document.getElementById('inquiryForm');
@@ -312,6 +312,16 @@
             localStorage.setItem('draft_' + id, e.target.value);
         });
     });
+
+    function escapeHtml(text) {
+        if (!text) return "";
+        return text.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
     // --- 介面切換邏輯 ---
     window.switchTab = function(tab) {
@@ -398,7 +408,7 @@
             });
     });
 
-    // --- 2. 案件查詢邏輯 (已修正) ---
+    // --- 2. 案件查詢邏輯 ---
     inquiryForm.addEventListener('submit', e => {
         e.preventDefault();
         inquiryBtn.disabled = true;
@@ -412,36 +422,40 @@
         formData.append('inquiryCaseId', document.getElementById('inquiryCaseId').value);
         formData.append('inquiryEmail', document.getElementById('inquiryEmail').value);
 
-        fetch(scriptURL, { method: 'POST', body: formData})
-            .then(response => response.json())
-            .then(response => {
-                loading.classList.add('hidden');
-                inquiryBtn.disabled = false;
-                inquiryBtn.innerText = "查詢狀態";
-                                
-                if (response.result === 'found') {
-                    const statusClass = response.status.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '').trim();
-                                         
-                    let staffHtml = '';
-                    if (response.handlingStaff && response.status === '處理完成') {
-                        staffHtml = `
-                            <div class="staff-info-box">
-                                辦理人員： ${response.handlingStaff}
-                            </div>
-                        `;
-                    }
-                                        
-                    inquiryResultDiv.innerHTML = `
-                        <div class="result-status">
-                            案件狀態：
-                            <span class="status-tag ${statusClass}">${response.status}</span>
+    fetch(scriptURL, { method: 'POST', body: formData})
+        .then(response => response.json())
+        .then(response => {
+            loading.classList.add('hidden');
+            inquiryBtn.disabled = false;
+            inquiryBtn.innerText = "查詢狀態";
+                            
+            if (response.result === 'found') {
+                const statusClass = response.status.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '').trim();
+                                     
+                let staffHtml = '';
+                if (response.handlingStaff && response.status === '處理完成') {
+                    staffHtml = `
+                        <div class="staff-info-box">
+                            辦理人員： ${escapeHtml(response.handlingStaff)}
                         </div>
-                        <p><strong>陳情項目：</strong> ${response.category}</p>
-                        <p><strong>案件內容：</strong> <br>${response.content ? response.content.replace(/\n/g, '<br>') : '無內容'}</p>
-                        <p><strong>回覆內容：</strong> <br>${response.contentReply ? response.contentReply.replace(/\n/g, '<br>') : '尚未有回覆內容'}</p>
-                        ${staffHtml} `;
-                    inquiryResultDiv.className = 'result-box success';
-                    inquiryResultDiv.classList.remove('hidden');
+                    `;
+                }
+                
+                inquiryResultDiv.innerHTML = `
+                    <div class="result-status">
+                        案件狀態：
+                        <span class="status-tag ${statusClass}">${escapeHtml(response.status)}</span>
+                    </div>
+                    <p><strong>陳情人姓名：</strong> ${response.name ? escapeHtml(response.name) : '匿名'}</p>
+                    <p><strong>陳情人學號：</strong> ${response.studentId ? escapeHtml(response.studentId) : '匿名'}</p>
+                    <p><strong>項目類別：</strong> ${escapeHtml(response.category)}</p>
+                    <p><strong>陳情主旨：</strong> ${response.subject ? escapeHtml(response.subject) : '無主旨'}</p>
+                    <p><strong>案件內容：</strong> <br>${response.content ? escapeHtml(response.content).replace(/\n/g, '<br>') : '無內容'}</p>
+                    <p><strong>回覆內容：</strong> <br>${response.contentReply ? escapeHtml(response.contentReply).replace(/\n/g, '<br>') : '尚未有回覆內容'}</p>
+                    ${staffHtml} `;
+                
+                inquiryResultDiv.className = 'result-box success';
+                inquiryResultDiv.classList.remove('hidden');
                                     
                 } else if (response.result === 'not_found') {
                     inquiryResultDiv.innerHTML = `
@@ -467,6 +481,7 @@
                 inquiryResultDiv.classList.remove('hidden');
             });
     });
+
 
 
     function toggleIdentity(val) {

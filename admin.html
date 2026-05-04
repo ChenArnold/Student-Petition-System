@@ -216,7 +216,7 @@
 </div>
 
 <script>
-    const scriptURL = 'Google App Script 的 網頁應用程式網址 (第三步複製的那個)'; 
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwMaRWcKnuKmflqEkt5HXFzeGeLlmflHoIfh6a4E3BDef-RQ1JxiohdIYBoZXkBBBH-/exec'; 
 
     let allCases = [];
     let currentTab = '待處理';
@@ -387,9 +387,13 @@
     }
 
     function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        if (!text) return "";
+        return text.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     function renderList() {
@@ -412,28 +416,28 @@
             if (c.status === '處理中') borderClass = 'status-processing';
             if (c.status === '處理完成' || c.status === '已結案' || c.status === '無效案件') borderClass = 'status-done';
 
-            // --- 1. 根據身分判斷顯示資訊 (你的需求位置) ---
+            // --- 1. 根據身分判斷顯示資訊 (已加入防注入) ---
             let infoHtml = "";
             if (c.identity === "實名") {
                 infoHtml = `
                     <div style="background: #e7f3ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 5px solid #2196F3; font-size: 14px; color: #333;">
                         <b style="color: #2196F3;">👤 實名陳情案件</b><br>
-                        姓名：${c.name || '未提供'}<br>
-                        學號：${c.studentId || '未提供'}<br>
-                        Mail：${c.email}
+                        姓名：${c.name ? escapeHtml(c.name) : '未提供'}<br>
+                        學號：${c.studentId ? escapeHtml(c.studentId) : '未提供'}<br>
+                        Mail：${escapeHtml(c.email)}
                     </div>`;
             } else {
                 infoHtml = `
                     <div style="background: #fff5f5; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 5px solid #ff4d4f; font-size: 14px; color: #333;">
                         <b style="color: #ff4d4f;">🔒 匿名陳情案件</b><br>
-                        Mail：${c.email}
+                        Mail：${escapeHtml(c.email)}
                     </div>`;
             }
 
             let statusControlHTML;
             if (isDoneTab) {
                 let displayStatus = c.status === '已結案' ? '已結案' : (c.status === '無效案件' ? '無效案件' : '處理完成');
-                statusControlHTML = `<span style="font-weight:bold; color:#5cb85c; padding:6px 12px; border:1px solid #5cb85c; border-radius:15px; font-size:14px; background:#f0fff0;">${displayStatus}</span>`;
+                statusControlHTML = `<span style="font-weight:bold; color:#5cb85c; padding:6px 12px; border:1px solid #5cb85c; border-radius:15px; font-size:14px; background:#f0fff0;">${escapeHtml(displayStatus)}</span>`;
             } else {
                 statusControlHTML = `
                     <select id="status-select-${c.caseId}" class="status-select">
@@ -445,24 +449,26 @@
             }
             
             let replyAreaHTML;
-            const handlingStaff = c.handlingStaff || '未記錄';
+            // 確保辦理人員字串安全
+            const safeHandlingStaff = c.handlingStaff ? escapeHtml(c.handlingStaff) : '未記錄';
+            
             if (isDoneTab) {
                 replyAreaHTML = `
                     <div class="reply-area">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">📢 最終回覆內容：</label>
-                        <textarea id="reply-${c.caseId}" readonly style="background:#e9ecef;">${c.reply || '無回覆內容'}</textarea>
+                        <textarea id="reply-${c.caseId}" readonly style="background:#e9ecef;">${c.reply ? escapeHtml(c.reply) : '無回覆內容'}</textarea>
                         <div style="margin-top:15px; font-weight:bold; color:var(--text-color); border-top:1px solid #eee; padding-top:10px;">
-                            辦理人員：<span style="font-weight:normal; color:var(--text-color);">${handlingStaff}</span>
+                            辦理人員：<span style="font-weight:normal; color:var(--text-color);">${safeHandlingStaff}</span>
                         </div>
                     </div>
                 `;
             } else {
                 const staffInfo = c.status === '處理中' ? 
-                `<div style="margin-bottom:15px; font-size:15px; ">陳辦人：${handlingStaff}</div>` : '';
+                `<div style="margin-bottom:15px; font-size:15px; ">陳辦人：${safeHandlingStaff}</div>` : '';
                 replyAreaHTML = `
                     <div class="reply-area">
                         <label style="font-weight:bold; display:block; margin-bottom:5px;">📢 回覆內容：</label>
-                        <textarea id="reply-${c.caseId}" placeholder="請在此輸入回覆..." onkeydown="handleReplyKey(event, '${c.caseId}')">${c.reply || ''}</textarea>
+                        <textarea id="reply-${c.caseId}" placeholder="請在此輸入回覆..." onkeydown="handleReplyKey(event, '${c.caseId}')">${c.reply ? escapeHtml(c.reply) : ''}</textarea>
                         ${staffInfo}
                         <div class="reply-btn-row">
                             <button class="reply-btn" id="replyBtn-${c.caseId}">送出回覆並結案 ✉️</button>
@@ -471,18 +477,18 @@
                 `;
             }
 
-            // --- 2. 將 infoHtml 嵌入到卡片 HTML 中 ---
+            // --- 2. 組合卡片 (主旨與內容皆已加入防注入) ---
             let div = document.createElement('div');
             div.className = `card ${borderClass}`;
             div.innerHTML = `
-                <div class="meta-info">${c.time.substring(0,16)} | ${c.caseId}</div>
+                <div class="meta-info">${escapeHtml(c.time.substring(0,16))} | ${escapeHtml(c.caseId)}</div>
                 <div class="card-header">
-                    <div class="card-title">【${c.category}】</div>
+                    <div class="card-title">【${escapeHtml(c.category)}】</div>
                     <div class="status-wrapper">${statusControlHTML}</div>
                 </div>
                 ${infoHtml} 
-                <div class="subject-line">📍 主旨：${c.subject || '無主旨'}</div>
-                <div class="content-box">${escapeHtml(c.content).replace(/\n/g, '<br>')}</div>
+                <div class="subject-line">📍 主旨：${c.subject ? escapeHtml(c.subject) : '無主旨'}</div>
+                <div class="content-box">${c.content ? escapeHtml(c.content).replace(/\n/g, '<br>') : '無內容'}</div>
                 ${replyAreaHTML}
             `;
             area.appendChild(div);

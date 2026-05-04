@@ -1,7 +1,7 @@
 const PETITION_SHEET = "Petitions";
 const STAFF_SHEET = "Staff";
-const DISCORD_WEBHOOK = "Discrod Webhook 網址"; 
-const RECAPTCHA_SECRET = "RECAPTCHA Secret key";
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1460171439197126763/LFUzr-5HmuxkBnTcNSJZrR6VLyxjTbug4czeAygkw2NYJutcTAFDjSCJpT3HPETSmlvu"; 
+const RECAPTCHA_SECRET = "6LdXfNUsAAAAADHydkgvctIRMxtUeawFnaTSL7ya";
 
 // 輔助函式：檢查管理員身分
 function verifyStaff(params) {
@@ -219,6 +219,8 @@ function doPost(e) {
         return responseJSON({
           result: "found", 
           status: data[i][9], 
+          name: data[i][2],
+          studentId: data[i][3],
           category: data[i][6], 
           subject: data[i][7],
           content: data[i][8], 
