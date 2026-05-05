@@ -1,7 +1,7 @@
 const PETITION_SHEET = "Petitions";
 const STAFF_SHEET = "Staff";
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1460171439197126763/LFUzr-5HmuxkBnTcNSJZrR6VLyxjTbug4czeAygkw2NYJutcTAFDjSCJpT3HPETSmlvu"; 
-const RECAPTCHA_SECRET = "6LdXfNUsAAAAADHydkgvctIRMxtUeawFnaTSL7ya";
+const DISCORD_WEBHOOK = "Discrod Webhook 網址"; 
+const RECAPTCHA_SECRET = "RECAPTCHA Secret key";
 
 // 輔助函式：檢查管理員身分
 function verifyStaff(params) {
@@ -66,13 +66,13 @@ function doPost(e) {
     const newRow = [
       timestamp, 
       caseId, 
-      anitizeForExcel(name), 
-      anitizeForExcel(studentId), 
-      anitizeForExcel(params.email), 
+      sanitizeForExcel(name), 
+      sanitizeForExcel(studentId), 
+      sanitizeForExcel(params.email), 
       identity, 
       params.category, 
-      anitizeForExcel(params.subject),
-      anitizeForExcel(params.content), 
+      sanitizeForExcel(params.subject),
+      sanitizeForExcel(params.content), 
       "待處理", 
       "", 
       ""
