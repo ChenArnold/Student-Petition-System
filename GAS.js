@@ -31,6 +31,16 @@ function verifyCaptcha(token) {
   return result.success;
 }
 
+function sanitizeForExcel(text) {
+  if (typeof text !== 'string') return text;
+  // 檢查是否以常見的公式觸發符號開頭
+  const forbiddenChars = ['=', '+', '-', '@'];
+  if (forbiddenChars.includes(text.charAt(0))) {
+    return "'" + text; // 在前面加上單引號，強迫 Excel 視為純文字
+  }
+  return text;
+}
+
 function doPost(e) {
   const params = e.parameter;
   const action = params.action;
@@ -56,13 +66,13 @@ function doPost(e) {
     const newRow = [
       timestamp, 
       caseId, 
-      name, 
-      studentId, 
-      params.email, 
+      anitizeForExcel(name), 
+      anitizeForExcel(studentId), 
+      anitizeForExcel(params.email), 
       identity, 
       params.category, 
-      params.subject, 
-      params.content, 
+      anitizeForExcel(params.subject),
+      anitizeForExcel(params.content), 
       "待處理", 
       "", 
       ""
