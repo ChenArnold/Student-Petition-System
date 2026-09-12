@@ -4,178 +4,236 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>工作人員後台</title>
-    <style>
-        /* ⭐ 修正 1: 將主要文字顏色改為 #656769 */
-        :root { --theme-color: #fda755; --text-color: #656769; }
-        body { font-family: "Microsoft JhengHei", sans-serif; background: transparent; margin: 0; padding: 10px; }
+<style>
+        /* ============ 風格主題變數（與 index.html 一致） ============ */
+        :root {
+            --bg: #f5f6f8;
+            --surface: #ffffff;
+            --border: #e2e4e9;
+            --text-primary: #1f2430;
+            --text-secondary: #6b7280;
+
+            --primary: #0088A8;
+            --primary-dark: #009FCC;
+            --primary-light: #eff6ff;
+
+            --success: #16a34a;
+            --success-light: #ecfdf3;
+
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+
+            --info: #0284c7;
+            --info-light: #f0f9ff;
+
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "PingFang TC", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+        }
+
         input, select, textarea {
-            width: 100%; padding: 12px; border: 1px solid #999;
-            border-radius: 6px; box-sizing: border-box;
-            font-family: inherit; font-size: 16px; margin-bottom: 15px;
-            color: var(--text-color); /* ⭐ 修正：輸入框、選單、回覆內容文字顏色 */
-            background-color: #fff;
+            width: 100%; padding: 11px 13px;
+            border: 1px solid var(--border) !important;
+            border-radius: var(--radius-sm); box-sizing: border-box;
+            font-family: inherit; font-size: 15px; margin-bottom: 15px;
+            color: var(--text-primary) !important;
+            background-color: var(--surface) !important;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--theme-color); box-shadow: 0 0 0 3px rgba(253, 167, 85, 0.25); }
-        
-        /* 基礎按鈕樣式 */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
         button {
-            background-color: var(--theme-color); color: white; border: none; padding: 12px 24px;
-            border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 16px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            position: relative;
-            z-index: 100;
+            background-color: var(--primary); color: #fff;
+            border: none; padding: 11px 22px;
+            border-radius: var(--radius-sm); cursor: pointer; font-weight: 600;
+            transition: background 0.15s ease; font-size: 15px;
+            position: relative; z-index: 100;
         }
-        button:hover { filter: brightness(0.9); transform: translateY(-1px); }
-        
-        /* 登入頁標題顏色 */
+        button:hover { background-color: var(--primary-dark); }
+
         #loginView {
-            max-width: 400px; margin: 40px auto; text-align: center;
-            background: transparent; /* ⭐ 修正：移除背景色 */
-            padding: 40px 30px; border-radius: 12px;
-            box-shadow: none;
-            border: none; /* ⭐ 修正：移除邊框 */
+            max-width: 380px; margin: 90px auto; text-align: center;
+            background: var(--surface);
+            padding: 40px 30px; border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
         }
         #loginView h2 {
-            margin: 0 0 20px 0;
-            color: var(--text-color);
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+            font-size: 21px;
         }
-        
+
         #dashboardView {
-            max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; min-height: 500px;
+            max-width: 900px; margin: 0 auto;
+            background: var(--surface);
+            padding: 25px; border-radius: var(--radius); min-height: 500px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
             position: relative; z-index: 1;
         }
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
-        .header-bar h3 {
-            margin:0;
-            color: var(--text-color);
+
+        .header-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 22px; border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
         }
-        .logout-btn { background: #999; font-size: 13px; padding: 6px 15px; border-radius: 30px; box-shadow: none;}
-        .tabs { display: flex; margin-bottom: 20px; }
+        .header-bar h3 { margin:0; color: var(--text-primary); font-size: 18px; }
+
+        .logout-btn {
+            background: var(--bg);
+            color: var(--text-primary); font-size: 13px; padding: 8px 16px;
+            border-radius: var(--radius-sm); border: 1px solid var(--border);
+        }
+        .logout-btn:hover { background: var(--danger-light); color: var(--danger); border-color: #f6c6c2; }
+
+        /* 頁籤：簡約分段控制 */
+        .tabs { display: flex; margin-bottom: 22px; gap: 4px; background: var(--bg); padding: 4px; border-radius: 10px; }
         .tab-btn {
-            flex: 1; background: transparent; border: 2px solid var(--theme-color); color: var(--theme-color);
-            padding: 10px; cursor: pointer; border-radius: 0; margin: 0; font-size: 15px; font-weight: bold;
+            flex: 1; background: transparent; border: none;
+            color: var(--text-secondary);
+            padding: 10px; cursor: pointer; border-radius: 8px;
+            margin: 0; font-size: 14px; font-weight: 600; transition: all 0.15s;
         }
-        .tab-btn:first-child { border-radius: 8px 0 0 8px; border-right: none; }
-        .tab-btn:last-child { border-radius: 0 8px 8px 0; border-left: none; }
-        .tab-btn.active { background: var(--theme-color); color: white; }
+        .tab-btn.active {
+            background: var(--surface); color: var(--primary-dark);
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+        }
+
+        /* 案件卡片 */
         .card {
-            background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px;
-            border: 1px solid #ddd; border-left: 6px solid #ccc; box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            position: relative;
-            z-index: 50;
+            background: var(--surface); border-radius: var(--radius); padding: 22px; margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-left: 4px solid #ccc;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
         }
-        .status-waiting { border-left-color: #f0ad4e; }
-        .status-processing { border-left-color: #5bc0de; }
-        .status-done { border-left-color: #5cb85c; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
-        .meta-info { font-size: 13px; color: #666; margin-bottom: 5px; display: block; }
-        .card-title { font-size: 18px; font-weight: bold; color: var(--text-color); margin: 0; }
-        .status-wrapper { display: flex; gap: 5px; align-items: center; }
+
+        .status-waiting { border-left-color: var(--warning); }
+        .status-processing { border-left-color: var(--info); }
+        .status-done { border-left-color: var(--success); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .meta-info { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 5px; display: block; font-family: 'SFMono-Regular', 'Courier New', monospace; }
+        .card-title { font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0; }
+
+        .status-wrapper { display: flex; gap: 8px; align-items: center; }
         .status-select {
-            padding: 5px 10px; font-size: 14px; font-weight: bold;
-            color: var(--text-color);
-            border-radius: 15px; border: 1px solid #999; cursor: pointer; width: auto; margin-bottom: 0; background: #fff;
+            padding: 6px 12px; font-size: 13px; font-weight: 600;
+            color: var(--text-primary) !important;
+            border-radius: 20px; border: 1px solid var(--border) !important;
+            cursor: pointer; width: auto !important; margin-bottom: 0;
+            background: var(--surface) !important;
         }
-        
-        /* 修正：儲存按鈕的顏色和大小 */
+
         .save-status-btn {
-            padding: 6px 12px;
-            font-size: 14px;
-            background: #6c757d;
-            border-radius: 15px;
-            margin: 0;
-            min-width: 40px;
-            color: white;
-            position: relative;
-            z-index: 101;
+            padding: 7px 14px; font-size: 13px;
+            background: var(--bg); color: var(--text-primary);
+            border-radius: 20px;
+            margin: 0; min-width: 40px;
+            position: relative; z-index: 101; border: 1px solid var(--border);
         }
-        
-        .content-box { background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap; margin-bottom: 15px; color: var(--text-color); border: 1px solid #eee; line-height: 1.6;}
-        
-        .reply-area { border-top: 1px dashed #ccc; padding-top: 15px; margin-top: 15px; }
-        .reply-area label {
-            color: var(--text-color);
+        .save-status-btn:hover { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary); }
+
+        .content-box {
+            background: var(--bg);
+            padding: 16px; border-radius: var(--radius-sm);
+            white-space: pre-wrap; margin-bottom: 16px;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            line-height: 1.7;
         }
-        /* 唯讀回覆內容的文字顏色也已透過上面的 general input 規則修正 */
-        .reply-area textarea { height: 100px; border: 1px solid #ccc;}
+
+        .reply-area { border-top: 1px dashed var(--border); padding-top: 16px; margin-top: 16px; }
+        .reply-area label { color: var(--text-primary); font-weight: 600; margin-bottom: 8px; display: block; }
+
+        .reply-area textarea {
+            height: 100px;
+            background: var(--surface) !important;
+            border: 1px solid var(--border) !important;
+        }
         .reply-btn-row { text-align: right; }
-        
-        /* 修正回覆按鈕 CSS */
+
         .reply-btn {
-            background: #5cb85c;
-            width: 100%;
-            font-size: 16px;
-            padding: 12px 24px;
-            border-radius: 30px;
-            box-shadow: 0 4px 6px rgba(92, 184, 92, 0.3);
+            background: var(--success);
+            color: #fff;
+            width: 100%; font-size: 15px; padding: 12px 24px;
+            border-radius: var(--radius-sm);
         }
-        .reply-btn:hover { background: #4cae4c; }
-        .hidden { display: none !important; }
-        
+        .reply-btn:hover { background: #128a3e; }
+
+        /* Loading 與彈窗 */
         #loading {
             position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(255,255,255,0.9);
+            background: rgba(245, 246, 248, 0.92);
             display: flex; justify-content: center; align-items: center;
-            z-index: 9999; flex-direction: column; color: var(--theme-color);
+            z-index: 9999; flex-direction: column; color: var(--text-primary);
         }
-        /* --- Custom Modal Styling (已修正為透明背景與強陰影) --- */
+
         #customModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent;
+            background: rgba(31, 36, 48, 0.35);
             display: flex; justify-content: center;
             align-items: center; z-index: 10000;
         }
         .modal-content {
-            background: white; padding: 30px; border-radius: 10px; max-width: 90%;
-            width: 400px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            transform: scale(0.9); opacity: 0; transition: all 0.2s ease-out;
+            background: var(--surface); padding: 32px; border-radius: var(--radius); max-width: 90%;
+            width: 380px; text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(16, 24, 40, 0.15);
+            transform: scale(0.96); opacity: 0; transition: all 0.15s ease-out;
+            color: var(--text-primary);
         }
         .modal-content.show { transform: scale(1); opacity: 1; }
-        .modal-message { margin-bottom: 25px; font-size: 18px; line-height: 1.5; color: var(--text-color); }
-        .modal-buttons button {
-            margin: 0 10px; padding: 10px 20px; border-radius: 5px; font-weight: normal;
-            width: 120px;
-        }
-        #modalBtnCancel { background-color: #6c757d; }
-        #modalBtnCancel:hover { background-color: #5a6268; }
-        #modalBtnConfirm { background-color: var(--theme-color); }
+        .modal-message { margin-bottom: 22px; font-size: 16px; line-height: 1.5; color: var(--text-primary); }
 
-        /* 新增：顯示主旨的樣式 */
-        .subject-line {
-            font-size: 15px;
-            font-weight: bold;
-            color: #444;
-            margin: 8px 0;
-            padding: 5px 0;
-            border-bottom: 1px solid #f0f0f0;
+        .modal-buttons button {
+            margin: 0 8px; padding: 10px 20px; border-radius: 20px; font-weight: 600;
+            width: 110px;
         }
-        /* 新增：人員名稱樣式 */
+        #modalBtnCancel { background-color: var(--bg); color: var(--text-primary); border: 1px solid var(--border); }
+        #modalBtnConfirm { background-color: var(--primary); color: #fff; }
+
+        .subject-line {
+            font-size: 15px; font-weight: 700;
+            color: var(--text-primary);
+            margin: 10px 0; padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
         #displayName {
-            font-size: 14px;
-            color: #888;
-            font-weight: normal;
-            margin-left: 10px;
+            font-size: 13px; color: var(--text-secondary); font-weight: 400; margin-left: 8px;
         }
 
         textarea[id^="reply-"] {
-            width: 100%;            /* 寬度填滿容器 */
-            max-width: 100%;        /* 禁止寬度超過容器導致破圖 */
-            min-height: 250px;      /* 增加預設長度 (高度) */
-            resize: vertical;       /* 只允許管理員上下拉長，不允許水平拉寬破壞佈局 */
-            line-height: 1.5;
-            padding: 15px;
-            font-size: 15px;
+            width: 100%; max-width: 100%; min-height: 220px;
+            resize: vertical; line-height: 1.6; padding: 14px; font-size: 14.5px;
+            background: var(--surface) !important;
         }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div id="loading" class="hidden" style="display: none;">
-    <h3 style="font-size: 24px;">🔄 處理中...</h3>
+    <h3 style="font-size: 20px;">處理中...</h3>
 </div>
 
-<!-- Custom Modal Structure -->
 <div id="customModal" class="hidden">
     <div class="modal-content" id="modalContent">
         <p class="modal-message" id="modalMessage"></p>
@@ -185,21 +243,20 @@
         </div>
     </div>
 </div>
-<!-- End Custom Modal Structure -->
 
 <div id="loginView">
     <h2>工作人員登入</h2>
-    <p style="color:#666; margin-bottom:20px;">臺中高工學生陳情系統網頁後台</p>
+    <p style="color:var(--text-secondary); margin-bottom:20px; font-size:14px;">田總召御用陳情系統網頁後台</p>
     <div style="text-align: left;">
-        <label style="font-weight:bold; display:block; margin-bottom:5px; color:var(--text-color);">帳號</label>
+        <label style="font-weight:600; display:block; margin-bottom:6px; font-size:14px;">帳號</label>
         <input type="text" id="acc" placeholder="請輸入帳號">
     </div>
     <div style="text-align: left;">
-        <label style="font-weight:bold; display:block; margin-bottom:5px; color:var(--text-color);">密碼</label>
+        <label style="font-weight:600; display:block; margin-bottom:6px; font-size:14px;">密碼</label>
         <input type="password" id="pwd" placeholder="請輸入密碼">
     </div>
     <button id="loginBtn" style="width:100%; margin-top:10px;">登入系統</button>
-    <p id="msg" style="color: #d9534f; margin-top: 15px; font-weight: bold;"></p>
+    <p id="msg" style="color: var(--danger); margin-top: 15px; font-weight: 600; font-size: 14px;"></p>
 </div>
 
 <div id="dashboardView" class="hidden">
@@ -216,11 +273,13 @@
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwMaRWcKnuKmflqEkt5HXFzeGeLlmflHoIfh6a4E3BDef-RQ1JxiohdIYBoZXkBBBH-/exec'; 
+    // ⚠️⚠️⚠️ 請將下方的網址換成您部署後的 Web 應用程式網址 ⚠️⚠️⚠️
+    const scriptURL =
+        'https://script.google.com/macros/s/OOOOOOOO/exec';
 
     let allCases = [];
     let currentTab = '待處理';
-    let confirmCallback = null; 
+    let confirmCallback = null;
 
     function hideModal() {
         document.getElementById('customModal').classList.add('hidden');
@@ -311,7 +370,7 @@
         let acc = document.getElementById('acc').value;
         let pwd = document.getElementById('pwd').value;
         if (!acc || !pwd) { document.getElementById('msg').innerText = "❌ 請輸入帳號與密碼"; return; }
-        
+
         toggleLoading(true);
         let fd = new FormData();
         fd.append('action', 'staffLogin');
@@ -323,10 +382,11 @@
             .then(d => {
                 toggleLoading(false);
                 if (d.result === 'success') {
-                    sessionStorage.setItem('staffAcc', acc); // 暫存帳號
-                    sessionStorage.setItem('staffPwd', pwd); // 暫存密碼
+                    sessionStorage.setItem('staffAcc', acc);
+                    sessionStorage.setItem('staffPwd', pwd);
                     sessionStorage.setItem('staffName', d.name || 'N/A');
                     sessionStorage.setItem('staffPosition', d.position || 'N/A');
+                    sessionStorage.setItem('isStaff', 'true');
                     document.getElementById('acc').value = ''; document.getElementById('pwd').value = '';
                     showDash();
                 } else {
@@ -343,19 +403,18 @@
         document.getElementById('loginView').style.display = 'none';
         document.getElementById('dashboardView').classList.remove('hidden');
         document.getElementById('dashboardView').style.display = 'block';
-        
-        // ⭐ 新增：顯示登入者名稱[cite: 5]
+
         const name = sessionStorage.getItem('staffName');
         const pos = sessionStorage.getItem('staffPosition');
         document.getElementById('displayName').innerText = ` (登入者：${pos} ${name} )`;
-        
+
         loadData();
     }
 
     function loadData() {
         toggleLoading(true);
         let fd = new FormData();
-        fd.append('action', 'getStaffData');    
+        fd.append('action', 'getStaffData');
 
         fd.append('account', sessionStorage.getItem('staffAcc'));
         fd.append('password', sessionStorage.getItem('staffPwd'));
@@ -368,7 +427,6 @@
                     allCases = d.cases;
                     renderList();
                 } else {
-                    // 🛠️ 修正：直接彈出後端回傳的錯誤內容 (例如：權限不足)
                     showCustomAlert("讀取失敗，後端回傳： " + (d.error || "未知錯誤"));
                 }
             })
@@ -407,7 +465,7 @@
         });
 
         if (filtered.length === 0) {
-            area.innerHTML = `<div style="text-align:center;color:#999;padding:40px;border:1px dashed #ccc;border-radius:10px;">目前無「${currentTab}」案件</div>`;
+            area.innerHTML = `<div style="text-align:center;color:var(--text-secondary);padding:40px;border:1px dashed var(--border);border-radius:var(--radius);">目前無「${currentTab}」案件</div>`;
             return;
         }
 
@@ -416,20 +474,20 @@
             if (c.status === '處理中') borderClass = 'status-processing';
             if (c.status === '處理完成' || c.status === '已結案' || c.status === '無效案件') borderClass = 'status-done';
 
-            // --- 1. 根據身分判斷顯示資訊 (已加入防注入) ---
+            // --- 1. 根據身分判斷顯示資訊（已加入防注入） ---
             let infoHtml = "";
             if (c.identity === "實名") {
                 infoHtml = `
-                    <div style="background: #e7f3ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 5px solid #2196F3; font-size: 14px; color: #333;">
-                        <b style="color: #2196F3;">👤 實名陳情案件</b><br>
+                    <div style="background: var(--info-light); padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 10px; border-left: 4px solid var(--info); font-size: 14px; color: var(--text-primary);">
+                        <b style="color: var(--info);">實名陳情案件</b><br>
                         姓名：${c.name ? escapeHtml(c.name) : '未提供'}<br>
                         學號：${c.studentId ? escapeHtml(c.studentId) : '未提供'}<br>
                         Mail：${escapeHtml(c.email)}
                     </div>`;
             } else {
                 infoHtml = `
-                    <div style="background: #fff5f5; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 5px solid #ff4d4f; font-size: 14px; color: #333;">
-                        <b style="color: #ff4d4f;">🔒 匿名陳情案件</b><br>
+                    <div style="background: var(--danger-light); padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 10px; border-left: 4px solid var(--danger); font-size: 14px; color: var(--text-primary);">
+                        <b style="color: var(--danger);">匿名陳情案件</b><br>
                         Mail：${escapeHtml(c.email)}
                     </div>`;
             }
@@ -437,47 +495,46 @@
             let statusControlHTML;
             if (isDoneTab) {
                 let displayStatus = c.status === '已結案' ? '已結案' : (c.status === '無效案件' ? '無效案件' : '處理完成');
-                statusControlHTML = `<span style="font-weight:bold; color:#5cb85c; padding:6px 12px; border:1px solid #5cb85c; border-radius:15px; font-size:14px; background:#f0fff0;">${escapeHtml(displayStatus)}</span>`;
+                statusControlHTML = `<span style="font-weight:700; color:var(--success); padding:6px 12px; border:1px solid var(--success); border-radius:20px; font-size:13px; background:var(--success-light);">${escapeHtml(displayStatus)}</span>`;
             } else {
                 statusControlHTML = `
                     <select id="status-select-${c.caseId}" class="status-select">
                         <option value="待處理" ${c.status==='待處理'?'selected':''}>待處理</option>
                         <option value="處理中" ${c.status==='處理中'?'selected':''}>處理中</option>
                     </select>
-                    <button class="save-status-btn" id="saveBtn-${c.caseId}" title="儲存狀態與回覆草稿">💾 儲存</button>
+                    <button class="save-status-btn" id="saveBtn-${c.caseId}" title="儲存狀態與回覆草稿">儲存</button>
                 `;
             }
-            
+
             let replyAreaHTML;
-            // 確保辦理人員字串安全
             const safeHandlingStaff = c.handlingStaff ? escapeHtml(c.handlingStaff) : '未記錄';
-            
+
             if (isDoneTab) {
                 replyAreaHTML = `
                     <div class="reply-area">
-                        <label style="font-weight:bold; display:block; margin-bottom:5px;">📢 最終回覆內容：</label>
-                        <textarea id="reply-${c.caseId}" readonly style="background:#e9ecef;">${c.reply ? escapeHtml(c.reply) : '無回覆內容'}</textarea>
-                        <div style="margin-top:15px; font-weight:bold; color:var(--text-color); border-top:1px solid #eee; padding-top:10px;">
-                            辦理人員：<span style="font-weight:normal; color:var(--text-color);">${safeHandlingStaff}</span>
+                        <label style="font-weight:600; display:block; margin-bottom:5px;">最終回覆內容：</label>
+                        <textarea id="reply-${c.caseId}" readonly style="background:var(--bg) !important; color:var(--text-secondary);">${c.reply ? escapeHtml(c.reply) : '無回覆內容'}</textarea>
+                        <div style="margin-top:15px; font-weight:600; color:var(--text-primary); border-top:1px solid var(--border); padding-top:10px;">
+                            辦理人員：<span style="font-weight:400; color:var(--text-primary);">${safeHandlingStaff}</span>
                         </div>
                     </div>
                 `;
             } else {
-                const staffInfo = c.status === '處理中' ? 
-                `<div style="margin-bottom:15px; font-size:15px; ">陳辦人：${safeHandlingStaff}</div>` : '';
+                const staffInfo = c.status === '處理中' ?
+                `<div style="margin-bottom:15px; font-size:14px; color:var(--text-secondary);">陳辦人：${safeHandlingStaff}</div>` : '';
                 replyAreaHTML = `
                     <div class="reply-area">
-                        <label style="font-weight:bold; display:block; margin-bottom:5px;">📢 回覆內容：</label>
+                        <label style="font-weight:600; display:block; margin-bottom:5px;">回覆內容：</label>
                         <textarea id="reply-${c.caseId}" placeholder="請在此輸入回覆..." onkeydown="handleReplyKey(event, '${c.caseId}')">${c.reply ? escapeHtml(c.reply) : ''}</textarea>
                         ${staffInfo}
                         <div class="reply-btn-row">
-                            <button class="reply-btn" id="replyBtn-${c.caseId}">送出回覆並結案 ✉️</button>
+                            <button class="reply-btn" id="replyBtn-${c.caseId}">送出回覆並結案</button>
                         </div>
                     </div>
                 `;
             }
 
-            // --- 2. 組合卡片 (主旨與內容皆已加入防注入) ---
+            // --- 2. 組合卡片（主旨與內容皆已加入防注入） ---
             let div = document.createElement('div');
             div.className = `card ${borderClass}`;
             div.innerHTML = `
@@ -486,8 +543,8 @@
                     <div class="card-title">【${escapeHtml(c.category)}】</div>
                     <div class="status-wrapper">${statusControlHTML}</div>
                 </div>
-                ${infoHtml} 
-                <div class="subject-line">📍 主旨：${c.subject ? escapeHtml(c.subject) : '無主旨'}</div>
+                ${infoHtml}
+                <div class="subject-line">主旨：${c.subject ? escapeHtml(c.subject) : '無主旨'}</div>
                 <div class="content-box">${c.content ? escapeHtml(c.content).replace(/\n/g, '<br>') : '無內容'}</div>
                 ${replyAreaHTML}
             `;
@@ -520,15 +577,14 @@
             .then(r => r.json())
             .then(d => {
                 toggleLoading(false);
-                if(d.result === 'success') { 
-                    showCustomAlert("✅ 狀態已儲存！"); 
-                    loadData(); 
+                if(d.result === 'success') {
+                    showCustomAlert("✅ 狀態已儲存！");
+                    loadData();
                 } else {
-                    // 🛠️ 修正：如果驗證失敗，這裡會跳出「權限不足」
                     showCustomAlert("❌ 儲存失敗： " + d.error);
                 }
-            }).catch(() => { 
-                toggleLoading(false); 
+            }).catch(() => {
+                toggleLoading(false);
                 showCustomAlert("網路連線異常");
             });
     }
@@ -546,19 +602,23 @@
                 fd.append('status', '處理完成');
                 fd.append('replyContent', content);
                 fd.append('handlingStaff', staffName);
-                fd.append('account', sessionStorage.getItem('staffAcc')); 
+                fd.append('account', sessionStorage.getItem('staffAcc'));
                 fd.append('password', sessionStorage.getItem('staffPwd'));
                 fetch(scriptURL, { method: 'POST', body: fd })
                 .then(r => r.json())
                 .then(d => {
                     toggleLoading(false);
-                    if(d.result === 'success') { 
-                        showCustomAlert("✅ 已送出回覆並結案！"); 
-                        loadData(); 
+                    if(d.result === 'success') {
+                        showCustomAlert("✅ 已送出回覆並結案！");
+                        loadData();
                     } else {
-                        showCustomAlert("❌ 操作失敗：" + d.error); 
+                        showCustomAlert("❌ 操作失敗：" + d.error);
                     }
-                }).catch(() => { toggleLoading(false); });
+                }).catch(error => {
+                    toggleLoading(false);
+                    console.error(error);
+                    showCustomAlert("❌ 連線錯誤或後端程式崩潰，請檢查網路或 Excel 權限。");
+                });
             }
         });
     }

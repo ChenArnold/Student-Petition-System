@@ -17,6 +17,7 @@ E-Mail：chenarnold0705@gmail.com<br>
     * **Email 通知**：提交案件後自動寄送收案確認信；結案時自動發送詳細回覆信件。
     * **Discord 整合**：新案件進入時，即時透過 Webhook 推送到工作群組。
 * **高度安全性**：
+    * 學生端需要驗證電子郵件，拒絕假帳號惡意陳情。
     * 整合 **Google reCAPTCHA v2** 阻擋惡意攻擊與機器人垃圾訊息。
     * 管理後台設有帳號密碼驗證機制。
 * **雲端化與零成本**：
@@ -54,7 +55,7 @@ E-Mail：chenarnold0705@gmail.com<br>
 4. 取得兩個金鑰 (請先保留好) ，這邊兩個金鑰上面的是`Site Key`，下面的是`Secret Key`
 
 ### 第二步的前置作業：申請Discord webhook
-1. 這還要教喔？？？ (如果你沒用Discord那就算了，請把第3行、第107行、第235~263行的`sendToDiscord`函式全部刪掉)
+1. 這還要教喔？？？ (如果你沒用Discord，請省略這個步驟即可，沒有設定他不會傳送)
 2. 首先你要有一個伺服器。(這我不教)
 3. 然後你要有一個頻道。(這我也不教)
 4. 確保你有管理webhook的權限。(沒啥好教的，有就有沒有就沒有，自己創的伺服器一定有)
@@ -66,10 +67,14 @@ E-Mail：chenarnold0705@gmail.com<br>
 ### 第二步：部署 Google Apps Script (GAS)
 1. 回到試算表，在試算表中點選 `擴充功能` -> `Apps Script`。
 2. 將專案中的 `GAS.js` 內容貼入程式碼編輯器。
-3. 修改 `GAS.js` 頂部的常數：
-    * `DISCORD_WEBHOOK`: 貼入你的 Discord 頻道 Webhook 網址。
-    * `RECAPTCHA_SECRET`: 貼入你的 reCAPTCHA Secret Key (對這邊是Secret Key不要貼錯了)。
-4. 修改裡面提到 `臺中高工` 的地方。
+3. 修改 `GAS.js` 要使用的常數：
+    * 部署前，請先到 Apps Script 編輯器左側「專案設定」 →「指令碼屬性 」新增以下屬性：
+    * `RECAPTCHA_SECRET`   Google reCAPTCHA 的「私鑰」(Secret Key) (第二步前置作業1)
+    * `DISCORD_WEBHOOK`    (選填) Discord 頻道 Webhook 網址；不填則略過 Discord 通知 (第二步前置作業2)
+    * `NOTIFY_EMAIL`       (選填) 要接收「新案件通知」的信箱；不填將不會寄送通知信
+4. 修改 `GAS.js` 前面的的常數：
+    * `SYS_NAM` 這裡是陳情系統的名稱 (電子郵件通知時的名稱)
+    * `DEP_NAM` 這裡是陳情系統管理者的名稱，用在電子郵件最後 OOO 敬上 的部分 (可以使用OOO學生會 等)
 5. 點選右上方 `部署` -> `新增部署` 。
     * 有一個齒輪的符號，點下去就對了，在那邊選 `網頁應用程式 (Web App)`
     * 設定參數如下：
@@ -81,15 +86,14 @@ E-Mail：chenarnold0705@gmail.com<br>
 ### 第三步：設定前端網頁
 1. 開啟 `index.html` (陳情端) 與 `admin.html` (管理端)。 (你可以用VScode開，如果你是狠人用txt我不反對)
 2. 在`index.html`中請修改以下內容
-   * 第6行：把臺中高工改成你的學校，這個是在標題顯示的文字
-   * 第205、206行：把臺中高工改成你的學校，這個是在陳情頁面中的標題文字 (反正改就對了)
-   * 第240行：你可以把學生會改成你的組織名稱(可能是學生代表團、班聯會等)
-   * 第258行：`<div class="g-recaptcha" data-sitekey="RECAPTCHA ID"></div>` 的RECAPTCHA ID請改成你在第二步複製的`Site Key`
-   * 第289行：請把你在第二步複製的`網頁應用程式網址 (URL)`網址貼上來
-   * 第334、335行：把臺中高工改成你的學校，這個是在陳情頁面中的標題文字 (反正改就對了)
+   * 第7行：請填入陳情系統的名字，這個是在標題顯示的文字
+   * 第585、586行：請填入陳情系統的名稱，這個是在陳情頁面中的標題文字 (反正改就對了)
+   * 第681行：`<div class="g-recaptcha" data-sitekey="RECAPTCHA ID"></div>` 的RECAPTCHA ID請改成你在第二步複製的`Site Key`
+   * 第756行：請把你在第二步複製的`網頁應用程式網址 (URL)`網址貼上來
+   * 第898、899行：這也是陳情系統的名稱，同585、586，這個是在陳情頁面中的標題文字
 3. 在`admin.html`中請修改以下內容
-   * 第192行：把臺中高工改成你的學校
-   * 第219行：請把你在第二步複製的`網頁應用程式網址 (URL)`網址貼上來
+   * 第249行：這裡是你陳情系統後台的名稱，會顯示在admin頁面中(不登錄也看的到)
+   * 第278行：請把你在第二步複製的`網頁應用程式網址 (URL)`網址貼上來
 
 ### 第四步：上架 GitHub Pages
 1. 進入 [cloudfare](https://www.cloudflare.com/zh-tw/) 官網
@@ -127,7 +131,7 @@ E-Mail：chenarnold0705@gmail.com<br>
 
 ## ⚠️ 注意事項
 
-1. **安全性**：雖然後台有密碼驗證，但由於 GAS 的特性，請確保 `GAS.js` 中的敏感資訊（如 Webhook）不會直接外流。
+1. **安全性**：請注意在 Google App Script 中的秘密資訊不要被公開。
 2. **限額**：Google Gmail API 每日發信有上限（個人帳戶約 500 封），請根據學校規模評估使用。
 
 ---

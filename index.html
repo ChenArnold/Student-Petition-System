@@ -1,512 +1,1255 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>臺中高工學生陳情系統</title>
+    <title>田總召御用陳情系統</title>
+
     <style>
-        /* 橘色主題色 */
+        /* ============ 風格主題變數 ============ */
         :root {
-            --theme-color: #fda755;
-            --text-color: #656769;
-            --light-shadow: rgba(253, 167, 85, 0.25);
-            --success-color: #5cb85c; /* 綠色 */
+            --bg: #f5f6f8;
+            --surface: #ffffff;
+            --border: #e2e4e9;
+            --text-primary: #1f2430;
+            --text-secondary: #6b7280;
+
+            --primary: #0088A8;
+            --primary-dark: #009FCC;
+            --primary-light: #eff6ff;
+
+            --success: #16a34a;
+            --success-light: #ecfdf3;
+
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+
+            --info: #0284c7;
+            --info-light: #f0f9ff;
+
+            --radius: 12px;
+            --radius-sm: 8px;
         }
-                
-        /* 全局設定 */
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: "Microsoft JhengHei", "Helvetica Neue", Arial, sans-serif;
-            margin: 0; padding: 0; background: transparent;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Microsoft JhengHei",
+                "PingFang TC",
+                Arial,
+                sans-serif;
+            margin: 0;
+            padding: 24px 16px;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
         }
 
-        /* 容器設定 */
         .petition-container {
-            max-width: 600px; margin: 0 auto; background: transparent;
-            padding: 10px; box-shadow: none; border: none;
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 28px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow:
+                0 1px 3px rgba(16, 24, 40, 0.06),
+                0 1px 2px rgba(16, 24, 40, 0.04);
         }
 
-        /* --- 新增：切換按鈕樣式 --- */
+        /* --- 切換按鈕 --- */
         .tab-buttons {
-            display: flex; justify-content: center; margin-bottom: 25px;
+            display: flex;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 26px;
+            gap: 4px;
         }
+
         .tab-button {
-            background-color: transparent; border: 2px solid var(--theme-color);
-            color: var(--theme-color); padding: 10px 20px;
-            font-size: 16px; font-weight: bold; cursor: pointer;
-            transition: all 0.3s;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border-radius: 8px;
         }
-        .tab-button:first-child { border-radius: 8px 0 0 8px; border-right: none; }
-        .tab-button:last-child { border-radius: 0 8px 8px 0; }
+
         .tab-button.active {
-            background-color: var(--theme-color); color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: var(--surface);
+            color: var(--primary-dark);
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
         }
-        .tab-button.active:first-child { border-right: 2px solid var(--theme-color); }
-        .tab-button.active:last-child { border-left: 2px solid var(--theme-color); }
-        /* --- 結束：切換按鈕樣式 --- */
 
-        /* 標題顏色 */
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h2 { margin: 0; color: var(--text-color); font-size: 26px; font-weight: 700; letter-spacing: 1px; }
-        .header p { margin: 8px 0 0; color: var(--text-color); font-size: 15px; }
-                
-        .form-group { margin-bottom: 20px; }
-                
-        /* 標籤顏色 */
+        .header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .header h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
         label {
-            display: block; font-weight: 600; margin-bottom: 8px;
-            font-size: 16px; color: var(--text-color);
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--text-primary);
         }
 
-        /* 輸入框樣式 */
-        input[type="text"], input[type="email"], select, textarea {
-            width: 100%; padding: 12px 15px; background-color: #ffffff !important;
-            border: 1px solid #ccc !important; border-radius: 8px;
-            color: var(--text-color); font-size: 15px; box-sizing: border-box;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            -webkit-appearance: none; appearance: none;
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px 13px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            transition:
+                border-color 0.15s,
+                box-shadow 0.15s;
+            -webkit-appearance: none;
+            appearance: none;
         }
-                
-        /* Select 下拉箭頭顏色 */
+
         select {
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23656769%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
-            background-position: right 15px top 50%;
+            background-position: right 14px top 50%;
             background-size: 10px auto;
         }
 
-        /* 輸入框聚焦樣式 - 橘色光暈 */
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--theme-color) !important;
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary) !important;
             outline: none;
-            box-shadow: 0 0 0 3px var(--light-shadow);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
 
-        textarea { height: 120px; resize: vertical; font-family: inherit; }
-                
-        .radio-group { display: flex; gap: 25px; margin-top: 5px; align-items: center; }
-                
-        /* Radio 選項文字顏色 */
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .field-hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .field-hint.success-text {
+            color: var(--success);
+        }
+
+        .field-hint.warn-text {
+            color: var(--danger);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 22px;
+            margin-top: 4px;
+            align-items: center;
+        }
+
         .radio-group label {
-            cursor: pointer; font-weight: normal; display: flex; align-items: center;
-            color: var(--text-color); margin-bottom: 0;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            color: var(--text-primary);
+            margin-bottom: 0;
+            font-size: 14px;
         }
-                
+
         .radio-group input[type="radio"] {
-            width: 20px; height: 20px; margin-right: 8px; margin-top: 0;
-            accent-color: var(--theme-color); /* Radio 選中顏色 */
-            cursor: pointer; border: 1px solid #ccc;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            margin-top: 0;
+            accent-color: var(--primary);
+            cursor: pointer;
         }
-                
-        .btn-container { text-align: center; margin-top: 30px; }
 
-        /* 按鈕樣式 */
-        button[type="submit"] { /* 讓兩個按鈕都吃到樣式 */
-            display: inline-block; width: 200px; background-color: var(--theme-color);
-            color: white; font-size: 16px; font-weight: bold;
-            padding: 12px 30px; border: none; border-radius: 30px;
-            cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        /* --- 驗證碼 --- */
+        .input-with-button {
+            display: flex;
+            gap: 10px;
         }
-                
-        button[type="submit"]:hover {
-            background-color: #e3964a;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+
+        .input-with-button input {
+            flex: 1;
+            min-width: 0;
         }
-                
+
+        .btn-outline {
+            white-space: nowrap;
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            color: var(--primary-dark);
+            padding: 0 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--primary-light);
+        }
+
+        .btn-outline:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 420px) {
+            .input-with-button {
+                flex-direction: column;
+            }
+        }
+
+        /* --- 步驟 --- */
+        .step-box {
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .step-indicator .step {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .step-indicator .number {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            color: var(--text-secondary);
+            font-weight: 700;
+            border: 1px solid var(--border);
+        }
+
+        .step-indicator .active {
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .step-indicator .active .number {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .step-indicator .line {
+            width: 50px;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* --- 按鈕 --- */
+        .btn-container {
+            text-align: center;
+            margin-top: 26px;
+        }
+
+        button[type="submit"],
+        .primary-action {
+            display: inline-block;
+            width: 220px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 13px 30px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        button[type="submit"]:hover:not(:disabled),
+        .primary-action:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
         button:disabled {
-            background-color: #ccc; cursor: not-allowed; transform: none; box-shadow: none;
+            background: #cbd2dc;
+            color: #f1f2f4;
+            cursor: not-allowed;
         }
 
-        .hidden { display: none !important; }
-                
-        /* 查詢結果顯示區塊樣式 */
+        .secondary-action {
+            display: inline-block;
+            width: 220px;
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 700;
+            padding: 12px 30px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .secondary-action:hover:not(:disabled) {
+            background: var(--bg);
+        }
+
+        .step-button-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 26px;
+        }
+
+        .step-button-row button {
+            margin: 0;
+        }
+
+        /* --- 驗證 Email 顯示 --- */
+        .verify-email-box {
+            margin-bottom: 20px;
+            padding: 14px 16px;
+            background: var(--info-light);
+            border: 1px solid #cbeafe;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .verify-email-box strong {
+            color: var(--info);
+            word-break: break-all;
+        }
+
+        /* --- 隱藏 --- */
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- 查詢結果 --- */
         #inquiryResult {
-            margin-top: 20px; padding: 20px; border: 1px solid #ddd;
-            border-radius: 8px; background-color: #f9f9f9;
-            line-height: 1.8; color: var(--text-color);
-            text-align: left; /* 讓內容靠左對齊 */
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background-color: var(--bg);
+            line-height: 1.8;
+            color: var(--text-primary);
+            text-align: left;
         }
+
         .result-status {
-            font-size: 18px; font-weight: bold; margin-bottom: 10px;
-            padding-bottom: 5px; border-bottom: 2px solid #ddd;
-        }
-        /* ⭐ 新增 CSS：辦理人員區塊樣式 - 帶有上分隔線 */
-        .staff-info-box {
-            margin-top: 15px; /* 與上面的回覆內容分開 */
-            padding-top: 10px;
-            border-top: 2px solid #ddd; /* 新增上方的分隔線 */
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 700;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
         }
-        /* ⭐ 結束新增 CSS */
+
+        .staff-info-box {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
         .status-tag {
-            display: inline-block; padding: 5px 10px; border-radius: 5px;
-            font-weight: bold; margin-left: 10px;
-            color: white; /* 所有實心標籤的文字顏色保持白色 */
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            margin-left: 8px;
         }
-                
-        /* ================================================= */
-        /* === 狀態顏色 - 根據您的需求進行最終修正 (使用 !important) === */
-        /* ================================================= */
-                
-        /* 待處理: 強制改為實心橘色 (#fda755) */
-        .status-tag.待處理 { 
-            background-color: #fda755 !important; 
-            color: white !important; 
-            border: none !important;
-            padding: 5px 10px !important; 
+
+        .status-tag.待處理 {
+            background-color: var(--warning-light);
+            color: var(--warning);
         }
-                
-        /* 處理中: 保持原樣 (實心藍 #5bc0de) */
-        .status-tag.處理中 { 
-            background-color: #5bc0de !important; 
-            color: white !important;
+
+        .status-tag.處理中 {
+            background-color: var(--info-light);
+            color: var(--info);
         }
-                
-        /* 處理完成: 強制改為實心綠色 (#5cb85c) */
+
         .status-tag.處理完成 {
-            background-color: #5cb85c !important; /* 強制改為綠色 */
-            color: white !important; 
-            border: none !important;
-            padding: 5px 10px !important;
+            background-color: var(--success-light);
+            color: var(--success);
         }
 
-        /* 無效案件: 保持原樣 (實心紅 #d9534f) */
-        .status-tag.無效案件 { 
-            background-color: #d9534f !important; 
-            color: white !important;
+        .status-tag.無效案件 {
+            background-color: var(--danger-light);
+            color: var(--danger);
         }
-        /* ================================================= */
 
-        /* 表單送出結果樣式 */
-        #loading { text-align: center; margin-top: 15px; color: var(--text-color); font-weight: bold; }
-                
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(245, 246, 248, 0.92);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            color: var(--text-primary);
+        }
+
+        #customModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(31, 36, 48, 0.35);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            padding: 32px;
+            border-radius: var(--radius);
+            max-width: 90%;
+            width: 380px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(16, 24, 40, 0.15);
+            transform: scale(0.96);
+            opacity: 0;
+            transition: all 0.15s ease-out;
+            color: var(--text-primary);
+        }
+
+        .modal-content.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-message {
+            margin-bottom: 22px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .modal-buttons button {
+            margin: 0 8px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            width: 110px;
+        }
+
+        #modalBtnCancel {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        #modalBtnConfirm {
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+        }
+
         #result {
-            margin-top: 20px; padding: 20px; border-radius: 8px; text-align: center; font-size: 15px; line-height: 1.6;
-            background: rgba(255,255,255,0.9);
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: var(--radius);
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.7;
+            border: 1px solid var(--border);
         }
-        .success { border: 1px solid #c3e6cb; color: #155724; background-color: #d4edda !important; }
-        .error { border: 1px solid #f5c6cb; color: #721c24; background-color: #f8d7da !important; }
+
+        .success {
+            background: var(--success-light);
+            border-color: #bbf0cf;
+            color: #0f5c30;
+        }
+
+        .error {
+            background: var(--danger-light);
+            border-color: #f6c6c2;
+            color: #8a2420;
+        }
     </style>
+
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
+
 <body>
 
-<div class="petition-container">
-    <div class="tab-buttons">
-        <button class="tab-button active" onclick="switchTab('submission')">案件陳情</button>
-        <button class="tab-button" onclick="switchTab('inquiry')">案件查詢</button>
+    <!-- 全域 Loading 蒙層 (比照 admin.html) -->
+    <div id="loading" class="hidden" style="display: none;">
+        <h3 style="font-size: 20px;">處理中...</h3>
     </div>
 
-    <div class="header">
-        <h2 id="mainTitle">臺中高工學生陳情系統</h2>
-        <p id="subTitle">學生自治會</p>
+    <!-- 自訂彈窗 Modal (比照 admin.html) -->
+    <div id="customModal" class="hidden">
+        <div class="modal-content" id="modalContent">
+            <p class="modal-message" id="modalMessage"></p>
+            <div class="modal-buttons">
+                <button id="modalBtnCancel" class="hidden">取消</button>
+                <button id="modalBtnConfirm">確定</button>
+            </div>
+        </div>
     </div>
 
-    <div id="submissionView">
-        <form id="submissionForm">
-            <div id="realNameFields">
-                <div class="form-group">
-                    <label>姓名</label>
-                    <input type="text" name="name" placeholder="請輸入姓名">
+    <div class="petition-container">
+
+        <!-- ================= 頁籤 ================= -->
+        <div class="tab-buttons">
+            <button class="tab-button active" type="button" id="tabBtn_submission">
+                案件陳情
+            </button>
+
+            <button class="tab-button" type="button" id="tabBtn_inquiry">
+                案件查詢
+            </button>
+        </div>
+
+        <!-- ================= 標題 ================= -->
+        <div class="header">
+            <h2 id="mainTitle">田總召御用陳情系統</h2>
+            <p id="subTitle">學生代表團</p>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 案件陳情 -->
+        <!-- ========================================================= -->
+        <div id="submissionView">
+            <form id="submissionForm">
+                <!-- 步驟指示 -->
+                <div class="step-indicator" id="stepIndicator">
+                    <div class="step active" id="indicatorStep1">
+                        <span class="number">1</span>
+                        <span>填寫資料</span>
+                    </div>
+
+                    <div class="line"></div>
+
+                    <div class="step" id="indicatorStep2">
+                        <span class="number">2</span>
+                        <span>Email 驗證</span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>學號：</label>
-                    <input type="text" name="studentId" placeholder="請輸入學號">
+
+                <!-- ================================================= -->
+                <!-- 第一步：填寫資料 -->
+                <!-- ================================================= -->
+
+                <div id="step1" class="step-box">
+                    <!-- 實名資料 -->
+                    <div id="realNameFields">
+                        <div class="form-group">
+                            <label>姓名</label>
+                            <input type="text" name="name" placeholder="請輸入姓名" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>學號</label>
+                            <input type="text" name="studentId" placeholder="請輸入學號" required>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label>Email（接收案件編號與通知）</label>
+                        <input type="email" name="email" id="emailInput" placeholder="請輸入 Email" required>
+                    </div>
+
+                    <!-- 身分 -->
+                    <div class="form-group">
+                        <label>陳情方式</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="identity" value="實名" checked>
+                                實名陳情
+                            </label>
+
+                            <label>
+                                <input type="radio" name="identity" value="匿名">
+                                匿名陳情
+                            </label>
+                        </div>
+                        <p id="identityHint" class="field-hint">
+                            * 實名陳情需填寫姓名與學號，以便我們後續追蹤聯繫。
+                        </p>
+                    </div>
+
+                    <!-- 類別 -->
+                    <div class="form-group">
+                        <label>項目類別</label>
+                        <select name="category" required>
+                            <option value="" disabled selected>請選擇項目...</option>
+                            <option value="案件陳情">案件陳情（學權、意見反饋）</option>
+                            <option value="問題查詢">問題查詢（法規、學生會相關）</option>
+                            <option value="校園問題">校園問題</option>
+                            <option value="其他建議">其他建議</option>
+                        </select>
+                    </div>
+
+                    <!-- 主旨 -->
+                    <div class="form-group">
+                        <label>主旨</label>
+                        <input type="text" name="subject" id="subject" placeholder="請輸入簡短主旨" required>
+                    </div>
+
+                    <!-- 內容 -->
+                    <div class="form-group">
+                        <label>內容</label>
+                        <p class="field-hint warn-text">
+                            * 如有附件，請上傳至 Google 雲端硬碟並開啟「知道連結的人皆可檢視」後，將連結貼於下方內容中。
+                        </p>
+                        <textarea name="content" placeholder="請詳細描述您遇到的問題..." required></textarea>
+                    </div>
+
+                    <!-- reCAPTCHA -->
+                    <div class="form-group" style="display:flex;justify-content:center;">
+                        <div class="g-recaptcha" data-sitekey="RECAPTCHA ID"></div>  <!-- reCAPTCHA -->
+                    </div>
+
+                    <!-- 下一步 -->
+                    <div class="btn-container">
+                        <button type="button" class="primary-action" id="nextStepBtn">
+                            下一步
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label>Email (接收案件編號用)</label>
-                <input type="email" name="email" placeholder="請輸入Email" required>
-            </div>
+                <!-- ================================================= -->
+                <!-- 第二步：Email 驗證 -->
+                <!-- ================================================= -->
+                <div id="step2" class="step-box hidden">
+                    <div class="verify-email-box">
+                        驗證碼將寄送至：
+                        <br>
+                        <strong id="verifyEmailDisplay"></strong>
+                    </div>
 
-            <label>陳情方式</label>
-            <div class="radio-group">
-                <!-- 增加 onclick 事件 -->
-                <label><input type="radio" name="identity" value="實名" checked onclick="toggleIdentity(this.value)"> 實名陳情</label>
-                <label><input type="radio" name="identity" value="匿名" onclick="toggleIdentity(this.value)"> 匿名陳情</label>
-            </div>
-            <p id="identityHint" style="font-size: 13px; color: #888; margin-top: 5px;">* 實名陳情需填寫姓名與學號，以便我們後續追蹤聯繫。</p>
+                    <div class="form-group">
+                        <label>Email 驗證碼</label>
+                        <input type="text" name="verifyCode" id="verifyCodeInput" placeholder="請輸入信箱收到的 6 位數驗證碼"
+                            maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+                        <p class="field-hint success-text" id="verifyHint">
+                            驗證碼已寄出，請至信箱查收（10 分鐘內有效）。
+                        </p>
+                    </div>
 
-            <div class="form-group">
-                <label>項目類別</label>
-                <select name="category" required>
-                    <option value="" disabled selected>請選擇項目...</option>
-                    <option value="案件陳情">案件陳情（學權、意見反饋）</option>
-                    <option value="問題查詢">問題查詢（法規、學生會相關）</option>
-                    <option value="校園問題">校園問題</option>
-                    <option value="其他建議">其他建議</option>
-                </select>
-            </div>
+                    <!-- 重新寄送 -->
+                    <div style="display:flex; justify-content:center; margin-top:12px;">
+                        <button type="button" id="sendCodeBtn" class="btn-outline">重新傳送驗證碼</button>
+                    </div>
 
-            <div class="form-group">
-                <label>主旨</label>
-                <input type="text" name="subject" id="subject" placeholder="請輸入簡短主旨" required>
-            </div>
+                    <!-- 返回 / 提交 -->
+                    <div class="step-button-row">
+                        <button type="button" id="backStepBtn" class="secondary-action">回上一步</button>
+                        <button type="submit" id="submitBtn">確認提交</button>
+                    </div>
+                </div>
+            </form>
 
-            <div class="form-group">
-                <label>內容</label>
-                <p style="font-size: 13px; color: #d9534f; margin-bottom: 5px;">* 如有附件，請上傳至 Google 雲端硬碟並開啟「知道連結的人皆可檢視」後，將連結貼於下方內容中。</p>
-                <textarea name="content" placeholder="請詳細描述您遇到的問題..." required></textarea>
-            </div>
+            <!-- 送出結果 -->
+            <div id="result" class="hidden"></div>
+        </div>
 
-            <div class="form-group" style="display: flex; justify-content: center; margin-top: 15px;">
-                <div class="g-recaptcha" data-sitekey="6LdXfNUsAAAAACEsxOxPTMciFbDuGAVARiaiHH6g"></div>
-            </div>
+        <!-- ========================================================= -->
+        <!-- 案件查詢 -->
+        <!-- ========================================================= -->
 
-            <div class="btn-container">
-                <button type="submit" id="submitBtn">送出陳情</button>
-            </div>
-        </form>
-        <div id="loading" class="hidden">🔄 處理中，請稍候...</div>
-        <div id="result" class="hidden"></div>
+        <div id="inquiryView" class="hidden">
+            <form id="inquiryForm">
+                <div class="form-group">
+                    <label>案件編號</label>
+                    <input type="text" id="inquiryCaseId" placeholder="例如：CASE-20240101-123" required>
+                </div>
+
+                <div class="form-group">
+                    <label>電子郵件 (Email)</label>
+                    <input type="email" id="inquiryEmail" placeholder="請輸入當初留下的 Email" required>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" id="inquiryBtn">查詢狀態</button>
+                </div>
+            </form>
+            <div id="inquiryResult" class="hidden result-box"></div>
+        </div>
     </div>
 
-    <div id="inquiryView" class="hidden">
-        <form id="inquiryForm">
-            <div class="form-group">
-                <label>案件編號</label>
-                <input type="text" id="inquiryCaseId" placeholder="例如：CASE-20240101-123" required>
-            </div>
-            <div class="form-group">
-                <label>電子郵件 (Email)</label>
-                <input type="email" id="inquiryEmail" placeholder="請輸入當初留下的 Email" required>
-            </div>
-            <div class="btn-container">
-                <button type="submit" id="inquiryBtn">查詢狀態</button>
-            </div>
-        </form>
-        <div id="inquiryResult" class="hidden result-box"></div>
-    </div>
-</div>
 
-<script>
-    // ⚠️⚠️⚠️ 請將下方的網址換成您部署後的 Web 應用程式網址 ⚠️⚠️⚠️
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwMaRWcKnuKmflqEkt5HXFzeGeLlmflHoIfh6a4E3BDef-RQ1JxiohdIYBoZXkBBBH-/exec';
+    <script>
+        // ⚠️⚠️⚠️ 請將下方的網址換成您部署後的 Web 應用程式網址 ⚠️⚠️⚠️
+        const scriptURL =
+            'https://script.google.com/macros/s/OOOOOOOO/exec';
 
-    const submissionForm = document.getElementById('submissionForm');
-    const inquiryForm = document.getElementById('inquiryForm');
-    const submissionView = document.getElementById('submissionView');
-    const inquiryView = document.getElementById('inquiryView');
-    const inquiryResultDiv = document.getElementById('inquiryResult');
-    const submitBtn = document.getElementById('submitBtn');
-    const inquiryBtn = document.getElementById('inquiryBtn');
-    const loading = document.getElementById('loading');
-    const resultDiv = document.getElementById('result');
-    const mainTitle = document.getElementById('mainTitle');
-    const subTitle = document.getElementById('subTitle');
-
-    const fields = ['name','studentId', 'email', 'subject', 'content'];
-    fields.forEach(id => {
-        const el = document.getElementsByName(id)[0];
-        // 載入暫存
-        if (localStorage.getItem('draft_' + id)) {
-            el.value = localStorage.getItem('draft_' + id);
-        }
-        // 監聽輸入存檔
-        el.addEventListener('input', (e) => {
-            localStorage.setItem('draft_' + id, e.target.value);
-        });
-    });
-
-    function escapeHtml(text) {
-        if (!text) return "";
-        return text.toString()
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    // --- 介面切換邏輯 ---
-    window.switchTab = function(tab) {
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                
-        if (tab === 'submission') {
-            document.querySelector('.tab-buttons button:nth-child(1)').classList.add('active');
-            submissionView.classList.remove('hidden');
-            inquiryView.classList.add('hidden');
-            mainTitle.innerText = "臺中高工學生陳情系統";
-            subTitle.innerText = "學生自治會";
-            resultDiv.classList.add('hidden'); // 切換時清空提示
-            inquiryResultDiv.classList.add('hidden');
-        } else {
-            document.querySelector('.tab-buttons button:nth-child(2)').classList.add('active');
-            submissionView.classList.add('hidden');
-            inquiryView.classList.remove('hidden');
-            mainTitle.innerText = "案件查詢系統";
-            subTitle.innerText = "輸入案件編號與學號查詢進度";
-            resultDiv.classList.add('hidden'); // 切換時清空提示
-            inquiryResultDiv.classList.add('hidden');
-        }
-    }
-
-    // 初始化顯示
-    window.onload = () => switchTab('submission');
-
-    // --- 1. 案件陳情送出邏輯 ---
-    submissionForm.addEventListener('submit', e => {
-        e.preventDefault();
-
-        const email = document.getElementsByName('email')[0].value;
+        // ============================================================
+        // 狀態變數
+        // ============================================================
         const emailRule = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (!emailRule.test(email)) {
-            alert("❌ Email 格式似乎不正確，請重新檢查。");
-            return;
+        let codeSent = false;
+        let cooldownTimer = null;
+        let confirmCallback = null;
+
+        const draftFields = ['name', 'studentId', 'email', 'subject', 'content'];
+
+        // ============================================================
+        // Modal 與 Loading 處理
+        // ============================================================
+        function toggleLoading(show) {
+            const el = document.getElementById('loading');
+            if (show) {
+                el.style.display = 'flex';
+                el.classList.remove('hidden');
+            } else {
+                el.style.display = 'none';
+                el.classList.add('hidden');
+            }
         }
-                    
-        submitBtn.disabled = true;
-        submitBtn.innerText = "傳送中...";
-        loading.classList.remove('hidden');
-        resultDiv.classList.add('hidden');
 
-        const formData = new FormData(submissionForm);
-        formData.append('action', 'submit'); // 告知後台這是送出動作
+        function hideModal() {
+            document.getElementById('customModal').classList.add('hidden');
+            document.getElementById('modalContent').classList.remove('show');
+        }
 
-        fetch(scriptURL, { method: 'POST', body: formData})
-            .then(response => response.json())
-            .then(response => {
-                loading.classList.add('hidden');
-                if (response.result === 'success') {
-                    // 1. 功能 7：成功送出後，清除 localStorage 中的即時存檔暫存
-                    const fields = ['studentId', 'email', 'subject', 'content'];
-                    grecaptcha.reset();
-                    fields.forEach(id => {
-                        localStorage.removeItem('draft_' + id);
-                    });
+        function showCustomAlert(message) {
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalBtnCancel').classList.add('hidden');
+            document.getElementById('modalBtnConfirm').onclick = () => {
+                hideModal();
+                confirmCallback = null;
+            };
+            document.getElementById('customModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('modalContent').classList.add('show'), 10);
+        }
 
-                    // 2. 重置表單與按鈕狀態[cite: 2]
-                    submissionForm.reset();
-                    submitBtn.innerText = "送出陳情";
-                    submitBtn.disabled = false;
-                                            
-                    // 3. 顯示成功訊息[cite: 2]
-                    resultDiv.innerHTML = `
-                        ✅ <strong>案件送出成功！</strong><br>
-                        您的案件編號為：<b>${response.caseId}</b><br>
-                        系統已自動發送「收案確認信」至您的信箱。
-                    `;
-                    resultDiv.className = 'success';
-                    resultDiv.classList.remove('hidden');
-                } else {
-                    throw new Error(response.error || '後台回傳錯誤，但無詳細錯誤訊息。');
+        // ============================================================
+        // 初始化與事件監聽綁定
+        // ============================================================
+        window.onload = () => {
+            initEventListeners();
+            initDrafts();
+            switchTab('submission');
+
+            const checkedIdentity = document.querySelector('input[name="identity"]:checked');
+            if (checkedIdentity) {
+                toggleIdentity(checkedIdentity.value);
+            }
+        };
+
+        function initEventListeners() {
+            document.getElementById('tabBtn_submission').addEventListener('click', () => switchTab('submission'));
+            document.getElementById('tabBtn_inquiry').addEventListener('click', () => switchTab('inquiry'));
+
+            document.getElementById('nextStepBtn').addEventListener('click', handleNextStep);
+            document.getElementById('sendCodeBtn').addEventListener('click', handleResendCode);
+            document.getElementById('backStepBtn').addEventListener('click', handleBackStep);
+
+            document.getElementById('submissionForm').addEventListener('submit', handleSubmissionSubmit);
+            document.getElementById('inquiryForm').addEventListener('submit', handleInquirySubmit);
+
+            // 單選按鈕切換監聽
+            document.querySelectorAll('input[name="identity"]').forEach(radio => {
+                radio.addEventListener('change', (e) => toggleIdentity(e.target.value));
+            });
+        }
+
+        function initDrafts() {
+            draftFields.forEach(id => {
+                const el = document.getElementsByName(id)[0];
+                if (!el) return;
+
+                const saved = localStorage.getItem('draft_' + id);
+                if (saved !== null) {
+                    el.value = saved;
                 }
-            })
-            .catch(error => {
-                loading.classList.add('hidden');
-                submitBtn.disabled = false;
-                submitBtn.innerText = "送出陳情";
-                resultDiv.innerHTML = '❌ 發生錯誤，請稍後再試。<br>錯誤細節：' + error.message;
+
+                el.addEventListener('input', e => {
+                    localStorage.setItem('draft_' + id, e.target.value);
+                });
+            });
+        }
+
+        // ============================================================
+        // 通用 API 工具
+        // ============================================================
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text
+                .toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        async function fetchJson(url, options = {}) {
+            const response = await fetch(url, options);
+            const text = await response.text();
+
+            if (!text) {
+                throw new Error(`後端沒有回傳資料（HTTP ${response.status}）。`);
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch (error) {
+                console.error('GAS 原始回應：', text);
+                if (response.status === 401) {
+                    throw new Error('Web App 回傳 401 Unauthorized。請確認存取權限。');
+                }
+                if (response.status === 404) {
+                    throw new Error('Web App 回傳 404。請確認部署網址。');
+                }
+                throw new Error(`後端回應無效 JSON（HTTP ${response.status}）。`);
+            }
+        }
+
+        // ============================================================
+        // 介面與步驟切換
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+
+            const submissionView = document.getElementById('submissionView');
+            const inquiryView = document.getElementById('inquiryView');
+            const mainTitle = document.getElementById('mainTitle');
+            const subTitle = document.getElementById('subTitle');
+            const resultDiv = document.getElementById('result');
+            const inquiryResultDiv = document.getElementById('inquiryResult');
+
+            if (tab === 'submission') {
+                document.getElementById('tabBtn_submission').classList.add('active');
+                submissionView.classList.remove('hidden');
+                inquiryView.classList.add('hidden');
+                mainTitle.innerText = "田總召御用陳情系統";
+                subTitle.innerText = "學生代表團";
+            } else {
+                document.getElementById('tabBtn_inquiry').classList.add('active');
+                submissionView.classList.add('hidden');
+                inquiryView.classList.remove('hidden');
+                mainTitle.innerText = "案件查詢系統";
+                subTitle.innerText = "輸入案件編號與 Email 查詢進度";
+            }
+
+            resultDiv.classList.add('hidden');
+            inquiryResultDiv.classList.add('hidden');
+        }
+
+        function showStep1() {
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('indicatorStep1').classList.add('active');
+            document.getElementById('indicatorStep2').classList.remove('active');
+        }
+
+        function showStep2() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('indicatorStep1').classList.remove('active');
+            document.getElementById('indicatorStep2').classList.add('active');
+        }
+
+        function toggleIdentity(val) {
+            const fields = document.getElementById('realNameFields');
+            const hint = document.getElementById('identityHint');
+            const nameInput = document.getElementsByName('name')[0];
+            const studentIdInput = document.getElementsByName('studentId')[0];
+
+            if (val === '匿名') {
+                fields.classList.add('hidden');
+                nameInput.value = '';
+                studentIdInput.value = '';
+                nameInput.required = false;
+                studentIdInput.required = false;
+                localStorage.removeItem('draft_name');
+                localStorage.removeItem('draft_studentId');
+                hint.innerHTML = "<b style='color: var(--danger);'>已開啟匿名模式：無需填寫姓名與學號，僅需提供 Email 接收案件編號。</b>";
+            } else {
+                fields.classList.remove('hidden');
+                nameInput.required = true;
+                studentIdInput.required = true;
+                hint.innerHTML = "* 實名陳情需填寫姓名與學號，以便我們後續追蹤聯繫。";
+            }
+        }
+
+        function startCooldown(seconds) {
+            let remaining = seconds;
+            const sendCodeBtn = document.getElementById('sendCodeBtn');
+
+            if (cooldownTimer) clearInterval(cooldownTimer);
+
+            sendCodeBtn.disabled = true;
+            sendCodeBtn.innerText = `重新發送 (${remaining})`;
+
+            cooldownTimer = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(cooldownTimer);
+                    cooldownTimer = null;
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.innerText = "重新傳送驗證碼";
+                } else {
+                    sendCodeBtn.innerText = `重新發送 (${remaining})`;
+                }
+            }, 1000);
+        }
+
+        // ============================================================
+        // 表單邏輯與 API 互動
+        // ============================================================
+        async function handleNextStep() {
+            const submissionForm = document.getElementById('submissionForm');
+            const emailInput = document.getElementById('emailInput');
+            const nextStepBtn = document.getElementById('nextStepBtn');
+
+            if (!submissionForm.checkValidity()) {
+                submissionForm.reportValidity();
+                return;
+            }
+
+            const email = emailInput.value.trim();
+            if (!emailRule.test(email)) {
+                showCustomAlert("❌ Email 格式似乎不正確，請重新檢查。");
+                emailInput.focus();
+                return;
+            }
+
+            const captchaToken = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse() : '';
+            if (!captchaToken) {
+                showCustomAlert("請先完成上方的機器人驗證。");
+                return;
+            }
+
+            nextStepBtn.disabled = true;
+            nextStepBtn.innerText = "寄送驗證碼...";
+
+            try {
+                const fd = new FormData();
+                fd.append('action', 'sendVerificationCode');
+                fd.append('email', email);
+                fd.append('g-recaptcha-response', captchaToken);
+
+                const response = await fetchJson(scriptURL, { method: 'POST', body: fd });
+
+                if (response.result !== 'success') {
+                    throw new Error(response.error || "驗證碼寄送失敗。");
+                }
+
+                codeSent = true;
+                document.getElementById('verifyEmailDisplay').textContent = email;
+                document.getElementById('verifyCodeInput').value = '';
+
+                const verifyHint = document.getElementById('verifyHint');
+                verifyHint.textContent = "驗證碼已寄出，請至信箱查收（10 分鐘內有效）。";
+                verifyHint.className = 'field-hint success-text';
+
+                showStep2();
+                startCooldown(60);
+
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+                setTimeout(() => document.getElementById('verifyCodeInput').focus(), 200);
+
+            } catch (error) {
+                console.error("發送驗證碼失敗：", error);
+                showCustomAlert("❌ 驗證碼寄送失敗\n\n" + error.message);
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+            } finally {
+                nextStepBtn.disabled = false;
+                nextStepBtn.innerText = "下一步";
+            }
+        }
+
+        async function handleResendCode() {
+            const emailInput = document.getElementById('emailInput');
+            const sendCodeBtn = document.getElementById('sendCodeBtn');
+            const email = emailInput.value.trim();
+
+            if (!emailRule.test(email)) {
+                showCustomAlert("❌ Email 格式不正確，請回上一步修改。");
+                return;
+            }
+
+            sendCodeBtn.disabled = true;
+            sendCodeBtn.innerText = "傳送中...";
+
+            try {
+                const fd = new FormData();
+                fd.append('action', 'sendVerificationCode');
+                fd.append('email', email);
+
+                const response = await fetchJson(scriptURL, { method: 'POST', body: fd });
+
+                if (response.result !== 'success') {
+                    throw new Error(response.error || "驗證碼重新寄送失敗。");
+                }
+
+                const verifyHint = document.getElementById('verifyHint');
+                verifyHint.textContent = "新的驗證碼已寄出，請至信箱查收（10 分鐘內有效）。";
+                verifyHint.className = 'field-hint success-text';
+
+                document.getElementById('verifyCodeInput').value = '';
+                startCooldown(60);
+                document.getElementById('verifyCodeInput').focus();
+
+            } catch (error) {
+                console.error("重新寄送驗證碼失敗：", error);
+                showCustomAlert("❌ 重新寄送失敗\n\n" + error.message);
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.innerText = "重新傳送驗證碼";
+            }
+        }
+
+        function handleBackStep() {
+            showStep1();
+            codeSent = false;
+            document.getElementById('verifyCodeInput').value = '';
+
+            const verifyHint = document.getElementById('verifyHint');
+            verifyHint.textContent = "請確認 Email 後重新取得驗證碼。";
+            verifyHint.className = 'field-hint';
+
+            if (cooldownTimer) {
+                clearInterval(cooldownTimer);
+                cooldownTimer = null;
+            }
+
+            const sendCodeBtn = document.getElementById('sendCodeBtn');
+            sendCodeBtn.disabled = false;
+            sendCodeBtn.innerText = "重新傳送驗證碼";
+
+            if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+        }
+
+        async function handleSubmissionSubmit(e) {
+            e.preventDefault();
+
+            if (document.getElementById('step2').classList.contains('hidden')) return;
+
+            if (!codeSent) {
+                showCustomAlert("請先取得 Email 驗證碼。");
+                return;
+            }
+
+            const verifyCodeInput = document.getElementById('verifyCodeInput');
+            const verifyCode = verifyCodeInput.value.trim();
+
+            if (!/^\d{6}$/.test(verifyCode)) {
+                showCustomAlert("❌ 請輸入 6 位數驗證碼。");
+                verifyCodeInput.focus();
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const resultDiv = document.getElementById('result');
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "提交中...";
+            toggleLoading(true);
+            resultDiv.classList.add('hidden');
+
+            try {
+                const formData = new FormData(document.getElementById('submissionForm'));
+                formData.append('action', 'submit');
+
+                const response = await fetchJson(scriptURL, { method: 'POST', body: formData });
+
+                if (response.result !== 'success') {
+                    throw new Error(response.error || "案件提交失敗。");
+                }
+
+                // 清除草稿
+                draftFields.forEach(id => localStorage.removeItem('draft_' + id));
+
+                if (cooldownTimer) {
+                    clearInterval(cooldownTimer);
+                    cooldownTimer = null;
+                }
+
+                document.getElementById('submissionForm').reset();
+                toggleIdentity('實名');
+                codeSent = false;
+                showStep1();
+
+                verifyCodeInput.value = '';
+                document.getElementById('sendCodeBtn').disabled = false;
+                document.getElementById('sendCodeBtn').innerText = "重新傳送驗證碼";
+
+                if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+
+                resultDiv.innerHTML = `
+                    ✅ <strong>案件送出成功！</strong><br>
+                    您的案件編號為：<b>${escapeHtml(response.caseId)}</b><br>
+                    系統已自動發送「收案確認信」至您的信箱。
+                `;
+                resultDiv.className = 'success';
+                resultDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("案件提交失敗：", error);
+                resultDiv.innerHTML = `❌ <strong>案件提交失敗</strong><br>${escapeHtml(error.message)}`;
                 resultDiv.className = 'error';
                 resultDiv.classList.remove('hidden');
-            });
-    });
+            } finally {
+                toggleLoading(false);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "確認提交";
+            }
+        }
 
-    // --- 2. 案件查詢邏輯 ---
-    inquiryForm.addEventListener('submit', e => {
-        e.preventDefault();
-        inquiryBtn.disabled = true;
-        inquiryBtn.innerText = "查詢中...";
-        loading.classList.remove('hidden');
-        inquiryResultDiv.classList.add('hidden');
+        async function handleInquirySubmit(e) {
+            e.preventDefault();
 
-        // 修正點：統一使用 formData 變數
-        const formData = new FormData(); 
-        formData.append('action', 'inquiry');
-        formData.append('inquiryCaseId', document.getElementById('inquiryCaseId').value);
-        formData.append('inquiryEmail', document.getElementById('inquiryEmail').value);
+            const caseId = document.getElementById('inquiryCaseId').value.trim();
+            const email = document.getElementById('inquiryEmail').value.trim();
+            const inquiryBtn = document.getElementById('inquiryBtn');
+            const inquiryResultDiv = document.getElementById('inquiryResult');
 
-    fetch(scriptURL, { method: 'POST', body: formData})
-        .then(response => response.json())
-        .then(response => {
-            loading.classList.add('hidden');
-            inquiryBtn.disabled = false;
-            inquiryBtn.innerText = "查詢狀態";
-                            
-            if (response.result === 'found') {
-                const statusClass = response.status.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '').trim();
-                                     
-                let staffHtml = '';
-                if (response.handlingStaff && response.status === '處理完成') {
-                    staffHtml = `
-                        <div class="staff-info-box">
-                            辦理人員： ${escapeHtml(response.handlingStaff)}
+            if (!caseId) {
+                showCustomAlert("請輸入案件編號。");
+                return;
+            }
+
+            if (!emailRule.test(email)) {
+                showCustomAlert("請輸入正確格式的 Email。");
+                return;
+            }
+
+            inquiryBtn.disabled = true;
+            inquiryBtn.innerText = "查詢中...";
+            toggleLoading(true);
+            inquiryResultDiv.classList.add('hidden');
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'inquiry');
+                formData.append('inquiryCaseId', caseId);
+                formData.append('inquiryEmail', email);
+
+                const response = await fetchJson(scriptURL, { method: 'POST', body: formData });
+
+                if (response.result === 'found') {
+                    const statusClass = (response.status || '').replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '').trim();
+                    let staffHtml = '';
+
+                    if (response.handlingStaff && response.status === '處理完成') {
+                        staffHtml = `<div class="staff-info-box">辦理人員：${escapeHtml(response.handlingStaff)}</div>`;
+                    }
+
+                    inquiryResultDiv.innerHTML = `
+                        <div class="result-status">
+                            案件狀態：<span class="status-tag ${escapeHtml(statusClass)}">${escapeHtml(response.status)}</span>
                         </div>
+                        <p><strong>陳情人姓名：</strong>${response.name ? escapeHtml(response.name) : '匿名'}</p>
+                        <p><strong>陳情人學號：</strong>${response.studentId ? escapeHtml(response.studentId) : '匿名'}</p>
+                        <p><strong>項目類別：</strong>${escapeHtml(response.category)}</p>
+                        <p><strong>陳情主旨：</strong>${response.subject ? escapeHtml(response.subject) : '無主旨'}</p>
+                        <p><strong>案件內容：</strong><br>${response.content ? escapeHtml(response.content).replace(/\n/g, '<br>') : '無內容'}</p>
+                        <p><strong>回覆內容：</strong><br>${response.contentReply ? escapeHtml(response.contentReply).replace(/\n/g, '<br>') : '尚未有回覆內容'}</p>
+                        ${staffHtml}
                     `;
-                }
-                
-                inquiryResultDiv.innerHTML = `
-                    <div class="result-status">
-                        案件狀態：
-                        <span class="status-tag ${statusClass}">${escapeHtml(response.status)}</span>
-                    </div>
-                    <p><strong>陳情人姓名：</strong> ${response.name ? escapeHtml(response.name) : '匿名'}</p>
-                    <p><strong>陳情人學號：</strong> ${response.studentId ? escapeHtml(response.studentId) : '匿名'}</p>
-                    <p><strong>項目類別：</strong> ${escapeHtml(response.category)}</p>
-                    <p><strong>陳情主旨：</strong> ${response.subject ? escapeHtml(response.subject) : '無主旨'}</p>
-                    <p><strong>案件內容：</strong> <br>${response.content ? escapeHtml(response.content).replace(/\n/g, '<br>') : '無內容'}</p>
-                    <p><strong>回覆內容：</strong> <br>${response.contentReply ? escapeHtml(response.contentReply).replace(/\n/g, '<br>') : '尚未有回覆內容'}</p>
-                    ${staffHtml} `;
-                
-                inquiryResultDiv.className = 'result-box success';
-                inquiryResultDiv.classList.remove('hidden');
-                                    
+                    inquiryResultDiv.className = 'result-box success';
+                    inquiryResultDiv.classList.remove('hidden');
+
                 } else if (response.result === 'not_found') {
                     inquiryResultDiv.innerHTML = `
                         <div class="result-status">❌ 案件查詢失敗</div>
-                        <p>${response.message}</p>
+                        <p>${escapeHtml(response.message || "找不到符合的案件。")}</p>
                     `;
                     inquiryResultDiv.className = 'result-box error';
                     inquiryResultDiv.classList.remove('hidden');
-                                    
                 } else {
-                    throw new Error(response.error || '後台查詢回傳錯誤。');
+                    throw new Error(response.error || "後端查詢回傳錯誤。");
                 }
-            })
-            .catch(error => {
-                loading.classList.add('hidden');
-                inquiryBtn.disabled = false;
-                inquiryBtn.innerText = "查詢狀態";
+            } catch (error) {
+                console.error("案件查詢失敗：", error);
                 inquiryResultDiv.innerHTML = `
                     <div class="result-status">❌ 系統錯誤</div>
-                    <p>無法查詢，請重新嘗試或洽技術人員。<br>錯誤細節：${error.message}</p>
+                    <p>無法查詢，請重新嘗試或洽技術人員。</p>
+                    <p style="font-size:13px;">${escapeHtml(error.message)}</p>
                 `;
                 inquiryResultDiv.className = 'result-box error';
                 inquiryResultDiv.classList.remove('hidden');
-            });
-    });
-
-
-
-    function toggleIdentity(val) {
-        const fields = document.getElementById('realNameFields');
-        const hint = document.getElementById('identityHint');
-        const nameInput = document.getElementsByName('name')[0];
-        const studentIdInput = document.getElementsByName('studentId')[0];
-
-        if (val === '匿名') {
-            // 隱藏區塊
-            fields.classList.add('hidden');
-            // 清空輸入並移除必填（如果有設的話）
-            nameInput.value = '';
-            studentIdInput.value = '';
-            nameInput.required = false;
-            studentIdInput.required = false;
-            hint.innerHTML = "<b style='color: #d9534f;'>🔒 已開啟匿名模式：無需填寫姓名與學號，僅需提供 Email 接收案件編號。</b>";
-        } else {
-            // 顯示區塊
-            fields.classList.remove('hidden');
-            nameInput.required = true;
-            studentIdInput.required = true;
-            hint.innerHTML = "* 實名陳情需填寫姓名與學號，以便我們後續追蹤聯繫。";
+            } finally {
+                toggleLoading(false);
+                inquiryBtn.disabled = false;
+                inquiryBtn.innerText = "查詢狀態";
+            }
         }
-    }
-</script>
+    </script>
 </body>
+
 </html>
