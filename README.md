@@ -72,6 +72,7 @@ E-Mail：chenarnold0705@gmail.com<br>
     * `RECAPTCHA_SECRET`   Google reCAPTCHA 的「私鑰」(Secret Key) (第二步前置作業1)
     * `DISCORD_WEBHOOK`    (選填) Discord 頻道 Webhook 網址；不填則略過 Discord 通知 (第二步前置作業2)
     * `NOTIFY_EMAIL`       (選填) 要接收「新案件通知」的信箱；不填將不會寄送通知信
+   <img width="1442" height="1305" alt="image" src="https://github.com/user-attachments/assets/ffd4e0ea-21c2-42dd-b133-6837f6cc9ad8" />
 4. 修改 `GAS.js` 前面的的常數：
     * `SYS_NAM` 這裡是陳情系統的名稱 (電子郵件通知時的名稱)
     * `DEP_NAM` 這裡是陳情系統管理者的名稱，用在電子郵件最後 OOO 敬上 的部分 (可以使用OOO學生會 等)
