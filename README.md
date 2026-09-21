@@ -152,6 +152,13 @@ E-Mail：chenarnold0705@gmail.com<br>
 
 ---
 
+## 🙏各校使用實例
+臺中高工學生自治會：[https://tcivssa-tall.pages.dev](https://tcivssa-tall.pages.dev)
+西松高中班聯會：[https://xsshbanlian.pages.dev](https://xsshbanlian.pages.dev)
+大安高工班聯會：
+
+---
+
 **💡 貢獻與反饋**<br>
 如果你有任何建議或發現 Bug，歡迎提交 Issue 或 Pull Request！ (但最簡單還是透過IG或Mail聯繫我)
 
