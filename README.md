@@ -153,8 +153,8 @@ E-Mail：chenarnold0705@gmail.com<br>
 ---
 
 ## 🙏各校使用實例
-臺中高工學生自治會：[https://tcivssa-tall.pages.dev](https://tcivssa-tall.pages.dev)
-西松高中班聯會：[https://xsshbanlian.pages.dev](https://xsshbanlian.pages.dev)
+臺中高工學生自治會：[https://tcivssa-tall.pages.dev](https://tcivssa-tall.pages.dev) <br>
+西松高中班聯會：[https://xsshbanlian.pages.dev](https://xsshbanlian.pages.dev) <br>
 大安高工班聯會：
 
 ---
