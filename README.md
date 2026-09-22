@@ -112,9 +112,10 @@ E-Mail：chenarnold0705@gmail.com<br>
 2. 往下滑在`reCAPTCHA 金鑰`中找到你的專案 並點擊 `金鑰詳細資料`
 3. 進入後點擊右上角的`編輯金鑰`
 4. 到下方的 `Key usage settings` 的 `新增網域` ，把你的網址打進去 (第四步部署完的網址) ，例如：`tcivssa-tall.pages.dev` (爽的話你還可以把localhost給刪了)
-5. 順便把`script.google.com`也打進去 (不要問為甚麼，反正是玄學 可能吧)
-6. 然後按完成以及最下面的`Save change`(這還要教喔？)
-7. 完成
+   <img width="797" height="381" alt="image" src="https://github.com/user-attachments/assets/b8fdccfb-ab7c-47ad-a09c-9f75b5a7e4de" />
+6. 順便把`script.google.com`也打進去 (不要問為甚麼，反正是玄學 可能吧)
+7. 然後按完成以及最下面的`Save change`(這還要教喔？)
+8. 完成
 
 <br>
 再不會我要殺人了:DDDDDD
